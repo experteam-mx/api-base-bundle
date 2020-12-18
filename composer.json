@@ -1,6 +1,6 @@
 {
-    "name": "experteam/microservices-base",
-    "description": "Base functionality package for microservices",
+    "name": "experteam/api-base-bundle",
+    "description": "Base functionality bundle for APIs",
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
