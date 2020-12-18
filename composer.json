@@ -18,7 +18,9 @@
         "symfony/form": "^5.0",
         "symfony/dependency-injection": "^5.0",
         "symfony/http-kernel": "^5.0",
+        "symfony/serializer": "^5.0",
         "symfony/security-bundle": "^5.0",
+        "symfony/validator": "^5.0",
         "predis/predis": "^1.1",
         "nelmio/api-doc-bundle": "^4.0"
     },
