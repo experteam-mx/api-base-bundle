@@ -4,6 +4,18 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services
         http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
+        <service id="api_base.token_authenticator"  class="Experteam\ApiBaseBundle\Security\ApiTokenAuthenticator">
+            <argument key="$predisClient" type="service" id="Predis\Client"/>
+        </service>
+
+        <service id="api_base.user_provider" class="Experteam\ApiBaseBundle\Security\UserProvider" />
+
+        <service id="Predis\Client" alias="snc_redis.default" />
+
+        <service id="Experteam\ApiBaseBundle\EventSubscriber\ResponseSubscriber">
+            <tag name="kernel.event_subscriber" />
+        </service>
+
         <service id="api_base.param" class="Experteam\ApiBaseBundle\Service\Param\Param" >
             <argument key="$client" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
             <argument key="$container" type="service" id="Symfony\Component\DependencyInjection\ContainerInterface"/>
@@ -21,13 +33,5 @@
             <argument key="$registry" type="service" id="Doctrine\Persistence\ManagerRegistry"/>
             <tag name="doctrine.repository_service" />
         </service>
-
-        <service id="api_base.token_authenticator"  class="Experteam\ApiBaseBundle\Security\ApiTokenAuthenticator">
-            <argument key="$predisClient" type="service" id="Predis\Client"/>
-        </service>
-
-        <service id="api_base.user_provider" class="Experteam\ApiBaseBundle\Security\UserProvider" />
-
-        <service id="Predis\Client" alias="snc_redis.default" />
     </services>
 </container>
