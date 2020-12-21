@@ -20,7 +20,7 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 
     public function __construct(Client $predisClient)
     {
-        $this->redisClient = $predisClient;
+        $this->predisClient = $predisClient;
     }
 
     public function supports(Request $request)
