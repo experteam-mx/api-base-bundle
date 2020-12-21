@@ -27,5 +27,7 @@
         </service>
 
         <service id="api_base.user_provider" class="Experteam\ApiBaseBundle\Security\UserProvider" />
+
+        <service id="Predis\Client" alias="snc_redis.default" />
     </services>
 </container>
