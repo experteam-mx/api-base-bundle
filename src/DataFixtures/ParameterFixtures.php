@@ -2,7 +2,7 @@
 
 namespace Experteam\ApiBaseBundle\DataFixtures;
 
-use Experteam\MicroservicesBaseBundle\Entity\Parameter;
+use Experteam\ApiBaseBundle\Entity\Parameter;
 use Doctrine\Persistence\ObjectManager;
 
 class ParameterFixtures

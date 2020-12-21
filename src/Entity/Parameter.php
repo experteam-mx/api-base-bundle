@@ -2,7 +2,7 @@
 
 namespace Experteam\ApiBaseBundle\Entity;
 
-use Experteam\MicroservicesBaseBundle\Repository\ParameterRepository;
+use Experteam\ApiBaseBundle\Repository\ParameterRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
