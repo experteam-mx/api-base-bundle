@@ -1,6 +1,6 @@
 <?php
 
-namespace Experteam\ApiBaseBundle\Service\Param;
+namespace Experteam\ApiBaseBundle\Service\JSend;
 
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
