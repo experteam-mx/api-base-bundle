@@ -15,7 +15,7 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class Param implements ParamInterface
+class Param implements JSendInterface
 {
     /**
      * @var HttpClientInterface
@@ -112,5 +112,29 @@ class Param implements ParamInterface
     public function findOneByName(string $name)
     {
         return $this->findByName(compact('name'));
+    }
+
+    /**
+     * @param array $parameters
+     */
+    public function load(array $parameters)
+    {
+        $manager = $this->container->get('doctrine')->getManager();
+        $parameterRepository = $manager->getRepository(Parameter::class);
+
+        foreach ($parameters as $value) {
+            $name = $value['name'];
+            $parameter = $parameterRepository->findOneBy(['name' => $name]);
+
+            if (is_null($parameter)) {
+                $parameter = new Parameter();
+                $parameter->setName($name);
+            }
+
+            $parameter->setValue($value['value']);
+            $manager->persist($parameter);
+        }
+
+        $manager->flush();
     }
 }

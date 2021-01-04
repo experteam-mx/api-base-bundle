@@ -1,19 +1,15 @@
 <?php
 
-namespace Experteam\ApiBaseBundle\EventSubscriber;
+namespace Experteam\ApiBaseBundle\Service\Param;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
-class ResponseSubscriber implements EventSubscriberInterface
+class JSend implements JSendInterface
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ResponseEvent::class => 'onKernelResponse'
-        ];
-    }
 
+    /**
+     * @param ResponseEvent $event
+     */
     public function onKernelResponse(ResponseEvent $event)
     {
         if (!$event->isMasterRequest()) {

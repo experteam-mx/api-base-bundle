@@ -16,6 +16,9 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
+        <service id="api_base.jsend" class="Experteam\ApiBaseBundle\Service\JSend\JSend" />
+        <service id="Experteam\ApiBaseBundle\Service\JSend\JSendInterface" alias="api_base.jsend" />
+
         <service id="api_base.param" class="Experteam\ApiBaseBundle\Service\Param\Param" >
             <argument key="$client" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
             <argument key="$container" type="service" id="Symfony\Component\DependencyInjection\ContainerInterface"/>
