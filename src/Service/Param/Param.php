@@ -48,7 +48,7 @@ class Param implements ParamInterface
     {
         $this->client = $client;
         $this->container = $container;
-        $this->user = $tokenStorage->getToken()->getUser();
+        $this->user = !is_null($tokenStorage->getToken()) ? $tokenStorage->getToken()->getUser() : null;
         $this->url = $this->container->getParameter('app.apis.companies.url.parameters_get');
     }
 
