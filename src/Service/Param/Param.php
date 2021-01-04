@@ -5,6 +5,7 @@ namespace Experteam\ApiBaseBundle\Service\Param;
 use Doctrine\ORM\NonUniqueResultException;
 use Experteam\ApiBaseBundle\Entity\Parameter;
 use Experteam\ApiBaseBundle\Repository\ParameterRepository;
+use Experteam\ApiBaseBundle\Security\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -27,9 +28,9 @@ class Param implements ParamInterface
     private $container;
 
     /**
-     * @var TokenStorageInterface
+     * @var User
      */
-    private $tokenStorage;
+    private $user;
 
     /**
      * @var string
@@ -47,7 +48,7 @@ class Param implements ParamInterface
     {
         $this->client = $client;
         $this->container = $container;
-        $this->tokenStorage = $tokenStorage;
+        $this->user = $tokenStorage->getToken()->getUser();
         $this->url = $this->container->getParameter('app.apis.companies.url.parameters_get');
     }
 
@@ -69,7 +70,7 @@ class Param implements ParamInterface
                 array_push($parameters,array('name' => $value));
             }
             $response = $this->client->request('POST', $this->url, [
-                'auth_bearer' => $this->tokenStorage->getToken(),
+                'auth_bearer' => $this->user->getToken(),
                 'body' => ['parameters' => $parameters]
             ]);
 
