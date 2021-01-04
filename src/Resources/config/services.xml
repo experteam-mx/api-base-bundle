@@ -12,10 +12,6 @@
 
         <service id="Predis\Client" alias="snc_redis.default" />
 
-        <service id="Experteam\ApiBaseBundle\EventSubscriber\ResponseSubscriber">
-            <tag name="kernel.event_subscriber" />
-        </service>
-
         <service id="api_base.jsend" class="Experteam\ApiBaseBundle\Service\JSend\JSend" />
         <service id="Experteam\ApiBaseBundle\Service\JSend\JSendInterface" alias="api_base.jsend" />
 
