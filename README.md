@@ -9,9 +9,16 @@ It includes:
 
 ### Install
 
-
+1. Configure required package on `composer.json`: <br>
 ```
-composer require experteam/api-base-bundle:dev-master
+"require": {
+    "experteam/api-base-bundle": "dev-master"
+}
+```
+
+2. Run the composer command to install or update the package: <br>
+```
+composer update experteam/api-base-bundle
 ```
 
 ### License
