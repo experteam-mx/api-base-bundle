@@ -12,13 +12,13 @@ It includes:
 1. Configure required package on `composer.json`: <br>
 ```
 "require": {
-    "experteam/api-base-bundle": "dev-master"
+    "experteam/api-base-bundle": "dev-master#[commit-hash]"
 }
 ```
 
 2. Run the composer command to install or update the package: <br>
 ```
-composer update --prefer-source experteam/api-base-bundle
+composer update experteam/api-base-bundle
 ```
 
 ### License
