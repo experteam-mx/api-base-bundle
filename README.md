@@ -18,7 +18,7 @@ It includes:
 
 2. Run the composer command to install or update the package: <br>
 ```
-composer update experteam/api-base-bundle
+composer update --prefer-source experteam/api-base-bundle
 ```
 
 ### License
