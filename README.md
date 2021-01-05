@@ -11,7 +11,7 @@ It includes:
 
 
 ```
-composer require experteam/api-base-bundle
+composer require experteam/api-base-bundle:dev-master
 ```
 
 ### License
