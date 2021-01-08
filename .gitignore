@@ -2,6 +2,7 @@
 /config/
 /public/
 /templates/
+/tests/
 /translations/
 /var/
 /vendor/
