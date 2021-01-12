@@ -14,16 +14,17 @@
         "ext-json": "*",
         "doctrine/orm": "2.7.*",
         "doctrine/doctrine-bundle": "2.0.*",
-        "antishov/doctrine-extensions-bundle": "^1.4",
-        "symfony/form": "5.1.*",
+        "symfony/serializer": "5.1.*",
+        "symfony/config": "5.1.*",
         "symfony/dependency-injection": "5.1.*",
         "symfony/http-kernel": "5.1.*",
-        "symfony/serializer": "5.1.*",
-        "symfony/security-bundle": "5.1.*",
+        "symfony/security-core": "5.1.*",
+        "symfony/security-guard": "5.1.*",
         "symfony/validator": "5.1.*",
         "predis/predis": "^1.1",
         "nelmio/api-doc-bundle": "^4.0",
-        "friendsofsymfony/rest-bundle": "^3.0"
+        "friendsofsymfony/rest-bundle": "^3.0",
+        "symfony/http-client": "5.1.*"
     },
     "autoload": {
         "psr-4": {
@@ -36,9 +37,16 @@
         }
     },
     "require-dev": {
-        "symfony/flex": "^1.11",
         "symfony/dotenv": "5.1.*",
         "symfony/phpunit-bridge": "5.1.*",
-        "symfony/config": "5.1.*"
+        "symfony/flex": "^1.11",
+        "symfony/framework-bundle": "5.1.*",
+        "symfony/security-bundle": "5.1.*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        }
     }
 }

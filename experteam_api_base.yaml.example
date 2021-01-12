@@ -1,0 +1,8 @@
+experteam_api_base:
+    params:
+        remote_url: %env(APIS_COMPANIES_URL)%/parameters-values
+#        defaults:
+#            API_CRAMX_LOGIN: gabymx|Dhl12345|ACG
+#            DROPOFF_PRODUCTS_RESTRICTED: 7
+#            DROPOFF_ACCOUNT_VALID: /(^95)|(^96)|(^98)|(^C)|(^F)/
+#            DROPOFF_ACCOUNTS_RESTRICTED: CASHMXB2L

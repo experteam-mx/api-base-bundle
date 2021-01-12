@@ -12,17 +12,17 @@
 
         <service id="Predis\Client" alias="snc_redis.default" />
 
-        <service id="api_base.jsend" class="Experteam\ApiBaseBundle\Service\JSend\JSend" />
+        <service id="api_base.jsend" class="Experteam\ApiBaseBundle\Service\JSend\JSend" public="true" />
         <service id="Experteam\ApiBaseBundle\Service\JSend\JSendInterface" alias="api_base.jsend" />
 
-        <service id="api_base.param" class="Experteam\ApiBaseBundle\Service\Param\Param" >
+        <service id="api_base.param" class="Experteam\ApiBaseBundle\Service\Param\Param" public="true">
             <argument key="$client" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
             <argument key="$container" type="service" id="Symfony\Component\DependencyInjection\ContainerInterface"/>
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\Param\ParamInterface" alias="api_base.param" />
 
-        <service id="api_base.request_util" class="Experteam\ApiBaseBundle\Service\RequestUtil\RequestUtil" >
+        <service id="api_base.request_util" class="Experteam\ApiBaseBundle\Service\RequestUtil\RequestUtil" public="true">
             <argument key="$serializer" type="service" id="Symfony\Component\Serializer\SerializerInterface"/>
             <argument key="$validator" type="service" id="Symfony\Component\Validator\Validator\ValidatorInterface"/>
         </service>
