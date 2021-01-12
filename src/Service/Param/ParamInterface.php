@@ -16,8 +16,4 @@ interface ParamInterface
      */
     public function findOneByName(string $name);
 
-    /**
-     * @param array $parameters
-     */
-    public function load(array $parameters);
 }

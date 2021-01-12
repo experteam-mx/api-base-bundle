@@ -2,11 +2,9 @@
 
 namespace Experteam\ApiBaseBundle\Service\Param;
 
-use Doctrine\ORM\NonUniqueResultException;
-use Experteam\ApiBaseBundle\Entity\Parameter;
-use Experteam\ApiBaseBundle\Repository\ParameterRepository;
+use Exception;
 use Experteam\ApiBaseBundle\Security\User;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
@@ -23,118 +21,74 @@ class Param implements ParamInterface
     private $client;
 
     /**
-     * @var ContainerInterface
+     * @var ParameterBagInterface
      */
-    private $container;
+    private $parameterBag;
 
     /**
-     * @var User
+     * @var TokenStorageInterface
      */
-    private $user;
-
-    /**
-     * @var string
-     */
-    private $url;
+    private $tokenStorage;
 
     /**
      * Param constructor.
      *
      * @param HttpClientInterface $client
-     * @param ContainerInterface $container
+     * @param ParameterBagInterface $parameterBag
      * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(HttpClientInterface $client, ContainerInterface $container, TokenStorageInterface $tokenStorage)
+    public function __construct(HttpClientInterface $client, ParameterBagInterface $parameterBag, TokenStorageInterface $tokenStorage)
     {
         $this->client = $client;
-        $this->container = $container;
-        $this->user = !is_null($tokenStorage->getToken()) ? $tokenStorage->getToken()->getUser() : null;
-        $this->url = $this->container->getParameter('app.apis.companies.url.parameters_get');
+        $this->parameterBag = $parameterBag;
+        $this->tokenStorage = $tokenStorage;
     }
 
     /**
      * @param array $values
      * @return array|string
-     * @throws NonUniqueResultException
+     * @throws Exception
      */
     public function findByName(array $values)
     {
-        $result = [];
-        $content = [];
-        $exception = true;
-        /** @var ParameterRepository $parameterRepository */
-        $parameterRepository = $this->container->get('doctrine')->getRepository(Parameter::class);
-        $parameters = array();
-        try {
-            foreach ($values as $value) {
-                array_push($parameters,array('name' => $value));
-            }
-            $response = $this->client->request('POST', $this->url, [
-                'auth_bearer' => $this->user->getToken(),
-                'body' => ['parameters' => $parameters]
-            ]);
+        $cfgParams = $this->parameterBag->get('experteam_api_base.params');
+        /** @var User $user */
+        $user = $this->tokenStorage->getToken()->getUser();
 
-            $content = $response->toArray(false);
-            $exception = false;
+        try {
+            $response = $this->client->request('POST', $cfgParams['remote_url'], [
+                'auth_bearer' => $user->getToken(),
+                'body' => [
+                    'parameters' => array_map(function($v) {
+                        return ['name' => $v];
+                    }, $values)
+                ]
+            ])->toArray(false);
         } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
+            throw new Exception('ExperteamApiBaseBundle: Error connecting to remote url params.');
         }
 
-        if (!$exception && isset($content['status']) && $content['status'] === 'success' && isset($content['data']['parameters'])) {
-            $data = $content['data']['parameters'];
-
-            foreach ($values as $value) {
-                $that = false;
-                foreach ($data as $datum) {
-                    if($datum['name'] == $value){
-                        $that = true;
-                        $result[$value] = $datum['value'];
-                        break;
-                    }
-
-                }
-                if(!$that){
-                    $result[$value] = $parameterRepository->findOneByName($value);
-                }
-
+        $result = [];
+        if ($response['status'] == 'success' && isset($response['data']['parameters'])) {
+            foreach ($response['data']['parameters'] as $paramValue) {
+                $result[$paramValue['name']] = $paramValue['value'];
             }
         } else {
-            $result = $parameterRepository->findByName($values);
+            foreach ($values as $v) {
+                $result[$v] = $cfgParams['defaults'][$v] ?? null;
+            }
         }
 
-        return ((count($result) === 1) ? array_values($result)[0] : $result);
+        return count($result) == 1 ? reset($result) : $result;
     }
 
     /**
      * @param string $name
      * @return string
-     * @throws NonUniqueResultException
+     * @throws Exception
      */
     public function findOneByName(string $name)
     {
-        return $this->findByName(compact('name'));
-    }
-
-    /**
-     * @param array $parameters
-     */
-    public function load(array $parameters)
-    {
-        $manager = $this->container->get('doctrine')->getManager();
-        $parameterRepository = $manager->getRepository(Parameter::class);
-
-        foreach ($parameters as $value) {
-            $name = $value['name'];
-            $parameter = $parameterRepository->findOneBy(['name' => $name]);
-
-            if (is_null($parameter)) {
-                $parameter = new Parameter();
-                $parameter->setName($name);
-            }
-
-            $parameter->setValue($value['value']);
-            $manager->persist($parameter);
-        }
-
-        $manager->flush();
+        return $this->findByName([$name]);
     }
 }

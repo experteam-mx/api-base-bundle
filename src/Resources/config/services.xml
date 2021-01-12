@@ -17,7 +17,7 @@
 
         <service id="api_base.param" class="Experteam\ApiBaseBundle\Service\Param\Param" public="true">
             <argument key="$client" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
-            <argument key="$container" type="service" id="Symfony\Component\DependencyInjection\ContainerInterface"/>
+            <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\Param\ParamInterface" alias="api_base.param" />
@@ -27,10 +27,5 @@
             <argument key="$validator" type="service" id="Symfony\Component\Validator\Validator\ValidatorInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\RequestUtil\RequestUtilInterface" alias="api_base.request_util" />
-
-        <service id="Experteam\ApiBaseBundle\Repository\ParameterRepository">
-            <argument key="$registry" type="service" id="Doctrine\Persistence\ManagerRegistry"/>
-            <tag name="doctrine.repository_service" />
-        </service>
     </services>
 </container>
