@@ -2,6 +2,9 @@
 
 namespace Experteam\ApiBaseBundle\Service\JSend;
 
+use FOS\RestBundle\Exception\InvalidParameterException;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
 class JSend implements JSendInterface
@@ -82,5 +85,17 @@ class JSend implements JSendInterface
         }
 
         $response->headers->add($headers);
+    }
+
+    /**
+     * @param ExceptionEvent $event
+     */
+    public function onKernelException(ExceptionEvent $event)
+    {
+        $e = $event->getThrowable();
+        if ($e instanceof InvalidParameterException) {
+            $message = sprintf('Invalid parameter "%s". %s', $e->getParameter()->name, $e->getViolations()[0]->getMessage());
+            $event->setThrowable(new BadRequestException($message));
+        }
     }
 }
