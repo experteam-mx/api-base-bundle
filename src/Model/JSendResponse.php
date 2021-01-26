@@ -7,7 +7,7 @@ use OpenApi\Annotations as OA;
 class JSendResponse
 {
     /**
-     * @OA\Property(type="string", description="Status.")
+     * @OA\Property(type="string", description="Status (success|fail|error)", example="success|fail|error")
      */
     public $status;
 
@@ -17,12 +17,12 @@ class JSendResponse
     public $data;
 
     /**
-     * @OA\Property(type="string", description="Message.")
+     * @OA\Property(type="string", description="Message (only if status is fail or error)")
      */
     public $message;
 
     /**
-     * @OA\Property(type="string", description="Code.")
+     * @OA\Property(type="string", description="Code (only if status is fail or error).")
      */
     public $code;
 }
