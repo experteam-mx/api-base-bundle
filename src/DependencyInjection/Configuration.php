@@ -22,6 +22,12 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('defaults')
                             ->useAttributeAsKey('name')
                             ->scalarPrototype()->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('elk_logger')
+                    ->children()
+                        ->scalarNode('channel')->isRequired()->end()
                     ->end()
                 ->end()
             ->end();

@@ -6,3 +6,6 @@ experteam_api_base:
 #            DROPOFF_PRODUCTS_RESTRICTED: 7
 #            DROPOFF_ACCOUNT_VALID: /(^95)|(^96)|(^98)|(^C)|(^F)/
 #            DROPOFF_ACCOUNTS_RESTRICTED: CASHMXB2L
+
+    elk_logger:
+        channel: api-shipments
