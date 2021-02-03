@@ -35,5 +35,10 @@
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface" alias="api_base.elk_logger" />
+
+        <service id="api_base.fixtures_load_command" class="Experteam\ApiBaseBundle\Command\LoadFixturesCommand">
+            <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
+            <tag name="console.command" command="experteam:fixtures:load" />
+        </service>
     </services>
 </container>
