@@ -1,6 +1,4 @@
 experteam_api_base:
-    fixtures:
-        release: 1.1.0
     params:
         remote_url: http://api_companies:8080/api/parameters-values
 #        defaults:
@@ -10,3 +8,5 @@ experteam_api_base:
 #            DROPOFF_ACCOUNTS_RESTRICTED: CASHMXB2L
     elk_logger:
         channel: api-shipments
+#    fixtures:
+#            release: 1.1.0

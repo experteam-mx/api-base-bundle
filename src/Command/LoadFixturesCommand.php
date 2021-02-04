@@ -43,8 +43,9 @@ class LoadFixturesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $ui = new SymfonyStyle($input, $output);
+        $cfgFixtures = $this->parameterBag->get('experteam_api_base.fixtures');
+        $version = $input->getOption('release') ?? $cfgFixtures['release'];
 
-        $version = $input->getOption('release') ?? $this->parameterBag->get('experteam_api_base.fixtures');
         if (empty($version)) {
             $ui->text("<info>> DataFixtures: nothing to execute, empty version.</info>");
             return Command::SUCCESS;

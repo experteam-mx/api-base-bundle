@@ -31,8 +31,9 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('fixtures')
+                    ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('release')->isRequired()->end()
+                        ->scalarNode('release')->defaultValue('0')->end()
                     ->end()
                 ->end()
             ->end();
