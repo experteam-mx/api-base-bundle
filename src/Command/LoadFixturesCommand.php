@@ -44,25 +44,17 @@ class LoadFixturesCommand extends Command
     {
         $ui = new SymfonyStyle($input, $output);
 
-        $version = $input->getOption('release');
-        if (is_null($version) && $this->parameterBag->has('app.fixtures.version')) {
-            $version = $this->parameterBag->get('app.fixtures.version');
-        }
-
-        if (is_null($version)) {
-            $ui->error("Version not found, please pass the release parameter or define the fixtures version variable.");
-            return Command::FAILURE;
-        }
-
-        if (!preg_match('/^(\d+\.)?(\d+\.)?(\*|\d+)$/', $version)) {
-            $ui->error("Invalid version code: {$version}");
-            return Command::FAILURE;
+        $version = $input->getOption('release') ?? $this->parameterBag->get('experteam_api_base.fixtures');
+        if (empty($version)) {
+            $ui->text("<info>> DataFixtures: nothing to execute, empty version.</info>");
+            return Command::SUCCESS;
         }
 
         $folder = sprintf('%s/src/DataFixtures/v%s/',
             $this->parameterBag->get('kernel.project_dir'),
             str_replace('.', '_', $version)
         );
+
         if (file_exists($folder)) {
             $_input = new ArrayInput([
                 '--append' => true,

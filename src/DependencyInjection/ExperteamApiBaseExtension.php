@@ -18,6 +18,7 @@ class ExperteamApiBaseExtension extends Extension
         $config = (new Processor())->processConfiguration(new Configuration(), $configs);
         $container->setParameter('experteam_api_base.params', $config['params']);
         $container->setParameter('experteam_api_base.elk_logger', $config['elk_logger']);
+        $container->setParameter('experteam_api_base.fixtures', $config['fixtures']);
     }
 
 }

@@ -30,6 +30,11 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('channel')->isRequired()->end()
                     ->end()
                 ->end()
+                ->arrayNode('fixtures')
+                    ->children()
+                        ->scalarNode('release')->isRequired()->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;
