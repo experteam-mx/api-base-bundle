@@ -50,6 +50,11 @@ class LoadFixturesCommand extends Command
             return Command::SUCCESS;
         }
 
+        if (!preg_match('/^(\d+\.)?(\d+\.)?(\*|\d+)$/', $version)) {
+            $ui->error("DataFixtures: invalid version code: {$version}");
+            return Command::FAILURE;
+        }
+
         $folder = sprintf('%s/src/DataFixtures/v%s/',
             $this->parameterBag->get('kernel.project_dir'),
             str_replace('.', '_', $version)
