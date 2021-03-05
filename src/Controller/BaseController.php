@@ -2,9 +2,11 @@
 
 namespace Experteam\ApiBaseBundle\Controller;
 
+use Experteam\ApiBaseBundle\Security\User;
 use Experteam\ApiBaseBundle\Service\Param\ParamInterface;
 use Experteam\ApiBaseBundle\Service\RequestUtil\RequestUtilInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
 class BaseController extends AbstractFOSRestController
@@ -37,5 +39,21 @@ class BaseController extends AbstractFOSRestController
     {
         $jsonEncoder = new JsonEncoder();
         return $jsonEncoder->decode($data, 'json');
+    }
+
+    /**
+     * @return array
+     */
+    protected function validateSession(): array
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $session = $user->getSession();
+
+        if (!isset($session)) {
+            throw new BadRequestHttpException('You do not have an active session.');
+        }
+
+        return $session;
     }
 }
