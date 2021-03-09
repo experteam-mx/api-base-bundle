@@ -3,6 +3,8 @@
 namespace Experteam\ApiBaseBundle\Service\RequestUtil;
 
 use Exception;
+use PhpDocReader\AnnotationException;
+use PhpDocReader\PhpDocReader;
 use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -109,34 +111,38 @@ class RequestUtil implements RequestUtilInterface
             return [];
         }
 
+        $reader = new PhpDocReader();
         $validationTypes = [];
         foreach ($refClass->getProperties() as $refProperty) {
             $fieldName = $refProperty->getName();
-            if (preg_match('/@var\s+([^\s]+)/', $refProperty->getDocComment(), $matches)) {
-                [, $type] = $matches;
-                if (in_array($type, ['string', 'int', 'float', 'bool', 'array'])) {
-                    $validationTypes[$fieldName] = new Assert\Type($type == 'float' ? 'numeric' : $type);
-                } else {
-                    $childType = strpos($type, "[]") === false ? $type : trim(explode('[]', $type)[0]);
-                    if (in_array($childType, ['string', 'int', 'float'])) {
+            try {
+                $type = $reader->getPropertyType($refProperty);
+            } catch (AnnotationException $e) {
+                continue;
+            }
+
+            if (in_array($type, ['string', 'int', 'float', 'bool', 'array'])) {
+                $validationTypes[$fieldName] = new Assert\Type($type == 'float' ? 'numeric' : $type);
+            } else {
+                $childType = strpos($type, "[]") === false ? $type : trim(explode('[]', $type)[0]);
+                if (in_array($childType, ['string', 'int', 'float'])) {
+                    $validationTypes[$fieldName] = [
+                        new Assert\Type('array'),
+                        new Assert\All([new Assert\Type($childType)])
+                    ];
+                } elseif (class_exists($childType)) {
+                    $_validationTypes = $this->getValidationTypes($childType);
+                    $_collection  = new Assert\Collection($_validationTypes);
+                    $_collection->allowMissingFields = true;
+                    $_collection->allowExtraFields = true;
+                    $validationTypes[$fieldName] = $_collection;
+                    if (strpos($type, "[]") === false) {
+                        $validationTypes[$fieldName] = $_collection;
+                    } else {
                         $validationTypes[$fieldName] = [
                             new Assert\Type('array'),
-                            new Assert\All([new Assert\Type($childType)])
+                            new Assert\All([$_collection])
                         ];
-                    } elseif (class_exists('App\\Model\\' . $childType)) {
-                        $_validationTypes = $this->getValidationTypes('App\\Model\\' . $childType);
-                        $_collection  = new Assert\Collection($_validationTypes);
-                        $_collection->allowMissingFields = true;
-                        $_collection->allowExtraFields = true;
-                        $validationTypes[$fieldName] = $_collection;
-                        if (strpos($type, "[]") === false) {
-                            $validationTypes[$fieldName] = $_collection;
-                        } else {
-                            $validationTypes[$fieldName] = [
-                                new Assert\Type('array'),
-                                new Assert\All([$_collection])
-                            ];
-                        }
                     }
                 }
             }

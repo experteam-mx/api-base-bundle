@@ -25,7 +25,8 @@
         "predis/predis": "^1.1",
         "nelmio/api-doc-bundle": "^4.0",
         "friendsofsymfony/rest-bundle": "^3.0",
-        "symfony/http-client": "5.1.*|5.2.*"
+        "symfony/http-client": "5.1.*|5.2.*",
+        "php-di/phpdoc-reader": "^2.2"
     },
     "autoload": {
         "psr-4": {
