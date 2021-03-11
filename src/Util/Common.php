@@ -6,7 +6,12 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class Common
 {
@@ -94,5 +99,17 @@ class Common
         if (!in_array($serviceCode, ['C', 'Q'])) {
             throw new BadRequestHttpException('The value of the service code parameter must be one of the following: "C" or "Q".');
         }
+    }
+
+    /**
+     * @param array $data
+     * @param string $type
+     * @return mixed
+     * @throws ExceptionInterface
+     */
+    public static function arrayToObject(array $data, string $type)
+    {
+        $serializer = new Serializer([new DateTimeNormalizer(), new ObjectNormalizer(null, null, null, new ReflectionExtractor())]);
+        return $serializer->denormalize($data, $type);
     }
 }
