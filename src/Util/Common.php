@@ -102,12 +102,12 @@ class Common
     }
 
     /**
-     * @param array $data
+     * @param mixed $data
      * @param string $type
      * @return mixed
      * @throws ExceptionInterface
      */
-    public static function arrayToObject(array $data, string $type)
+    public static function arrayToObject($data, string $type)
     {
         $serializer = new Serializer([new DateTimeNormalizer(), new ObjectNormalizer(null, null, null, new ReflectionExtractor())]);
         return $serializer->denormalize($data, $type);
