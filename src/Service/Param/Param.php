@@ -55,7 +55,7 @@ class Param implements ParamInterface
         $cfgParams = $this->parameterBag->get('experteam_api_base.params');
         $url = (isset($cfgParams['remote_url']) ? $cfgParams['remote_url'] : null);
 
-        if (!is_null($url)) {
+        if (filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED)) {
             $token = $this->tokenStorage->getToken();
 
             if (!is_null($token)) {
