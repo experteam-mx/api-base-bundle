@@ -51,35 +51,40 @@ class Param implements ParamInterface
      */
     public function findByName(array $values)
     {
-        $cfgParams = $this->parameterBag->get('experteam_api_base.params');
+        $result = [];
         /** @var User $user */
         $user = $this->tokenStorage->getToken()->getUser();
+        $cfgParams = $this->parameterBag->get('experteam_api_base.params');
+        $url = (isset($cfgParams['remote_url']) ? $cfgParams['remote_url'] : null);
 
-        try {
-            $response = $this->client->request('POST', $cfgParams['remote_url'], [
-                'auth_bearer' => $user->getToken(),
-                'body' => [
-                    'parameters' => array_map(function($v) {
-                        return ['name' => $v];
-                    }, $values)
-                ]
-            ])->toArray(false);
-        } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
-            throw new Exception('ExperteamApiBaseBundle: Error connecting to remote url params.');
+        if (!is_null($url)) {
+            try {
+                $response = $this->client->request('POST', $url, [
+                    'auth_bearer' => $user->getToken(),
+                    'body' => [
+                        'parameters' => array_map(function ($v) {
+                            return ['name' => $v];
+                        }, $values)
+                    ]
+                ])->toArray(false);
+            } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
+                throw new Exception('ExperteamApiBaseBundle: Error connecting to remote url params.');
+            }
+
+            if ($response['status'] == 'success' && isset($response['data']['parameters'])) {
+                foreach ($response['data']['parameters'] as $paramValue) {
+                    $result[$paramValue['name']] = $paramValue['value'];
+                }
+            }
         }
 
-        $result = [];
-        if ($response['status'] == 'success' && isset($response['data']['parameters'])) {
-            foreach ($response['data']['parameters'] as $paramValue) {
-                $result[$paramValue['name']] = $paramValue['value'];
-            }
-        } else {
+        if (empty($result)) {
             foreach ($values as $v) {
                 $result[$v] = $cfgParams['defaults'][$v] ?? null;
             }
         }
 
-        return count($result) == 1 ? reset($result) : $result;
+        return ((count($result) === 1) ? reset($result) : $result);
     }
 
     /**
