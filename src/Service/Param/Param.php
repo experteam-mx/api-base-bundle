@@ -62,22 +62,24 @@ class Param implements ParamInterface
                 /** @var User $user */
                 $user = $token->getUser();
 
-                try {
-                    $response = $this->client->request('POST', $url, [
-                        'auth_bearer' => $user->getToken(),
-                        'body' => [
-                            'parameters' => array_map(function ($v) {
-                                return ['name' => $v];
-                            }, $values)
-                        ]
-                    ])->toArray(false);
-                } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
-                    throw new Exception('ExperteamApiBaseBundle: Error connecting to remote url params.');
-                }
+                if ($user instanceof User) {
+                    try {
+                        $response = $this->client->request('POST', $url, [
+                            'auth_bearer' => $user->getToken(),
+                            'body' => [
+                                'parameters' => array_map(function ($v) {
+                                    return ['name' => $v];
+                                }, $values)
+                            ]
+                        ])->toArray(false);
+                    } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
+                        throw new Exception('ExperteamApiBaseBundle: Error connecting to remote url params.');
+                    }
 
-                if ($response['status'] == 'success' && isset($response['data']['parameters'])) {
-                    foreach ($response['data']['parameters'] as $paramValue) {
-                        $result[$paramValue['name']] = $paramValue['value'];
+                    if ($response['status'] == 'success' && isset($response['data']['parameters'])) {
+                        foreach ($response['data']['parameters'] as $paramValue) {
+                            $result[$paramValue['name']] = $paramValue['value'];
+                        }
                     }
                 }
             }
