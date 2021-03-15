@@ -52,28 +52,33 @@ class Param implements ParamInterface
     public function findByName(array $values)
     {
         $result = [];
-        /** @var User $user */
-        $user = $this->tokenStorage->getToken()->getUser();
         $cfgParams = $this->parameterBag->get('experteam_api_base.params');
         $url = (isset($cfgParams['remote_url']) ? $cfgParams['remote_url'] : null);
 
         if (!is_null($url)) {
-            try {
-                $response = $this->client->request('POST', $url, [
-                    'auth_bearer' => $user->getToken(),
-                    'body' => [
-                        'parameters' => array_map(function ($v) {
-                            return ['name' => $v];
-                        }, $values)
-                    ]
-                ])->toArray(false);
-            } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
-                throw new Exception('ExperteamApiBaseBundle: Error connecting to remote url params.');
-            }
+            $token = $this->tokenStorage->getToken();
 
-            if ($response['status'] == 'success' && isset($response['data']['parameters'])) {
-                foreach ($response['data']['parameters'] as $paramValue) {
-                    $result[$paramValue['name']] = $paramValue['value'];
+            if (!is_null($token)) {
+                /** @var User $user */
+                $user = $token->getUser();
+
+                try {
+                    $response = $this->client->request('POST', $url, [
+                        'auth_bearer' => $user->getToken(),
+                        'body' => [
+                            'parameters' => array_map(function ($v) {
+                                return ['name' => $v];
+                            }, $values)
+                        ]
+                    ])->toArray(false);
+                } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
+                    throw new Exception('ExperteamApiBaseBundle: Error connecting to remote url params.');
+                }
+
+                if ($response['status'] == 'success' && isset($response['data']['parameters'])) {
+                    foreach ($response['data']['parameters'] as $paramValue) {
+                        $result[$paramValue['name']] = $paramValue['value'];
+                    }
                 }
             }
         }
