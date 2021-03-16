@@ -46,12 +46,16 @@ class BaseController extends AbstractFOSRestController
      */
     protected function validateSession(): array
     {
-        /** @var User $user */
-        $user = $this->getUser();
-        $session = $user->getSession();
+        $session = [];
 
-        if (!isset($session)) {
-            throw new BadRequestHttpException('You do not have an active session.');
+        if ($_ENV['APP_SECURITY_ACCESS_ROLE'] !== 'IS_ANONYMOUS') {
+            /** @var User $user */
+            $user = $this->getUser();
+            $session = $user->getSession();
+
+            if (!isset($session)) {
+                throw new BadRequestHttpException('You do not have an active session.');
+            }
         }
 
         return $session;
