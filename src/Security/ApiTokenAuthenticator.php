@@ -26,7 +26,8 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
     public function supports(Request $request)
     {
         // look for header "Authorization: Bearer <token>"
-        return $request->headers->has('Authorization')
+        return (!isset($_ENV['APP_SECURITY_ACCESS_ROLE']) || $_ENV['APP_SECURITY_ACCESS_ROLE'] !== 'IS_ANONYMOUS')
+            && $request->headers->has('Authorization')
             && 0 === strpos($request->headers->get('Authorization'), 'Bearer ');
     }
 
