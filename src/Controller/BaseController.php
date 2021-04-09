@@ -48,7 +48,7 @@ class BaseController extends AbstractFOSRestController
     {
         $session = [];
 
-        if ($_ENV['APP_SECURITY_ACCESS_ROLE'] !== 'IS_ANONYMOUS') {
+        if (!isset($_ENV['APP_SECURITY_ACCESS_ROLE']) || $_ENV['APP_SECURITY_ACCESS_ROLE'] !== 'IS_ANONYMOUS') {
             /** @var User $user */
             $user = $this->getUser();
             $session = $user->getSession();
