@@ -120,9 +120,10 @@ class Common
 
     /**
      * @param ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|null $e
+     * @param array $content
      * @param string $message
      */
-    public static function processHttpResponse($e, string $message)
+    public static function processHttpResponse($e, array $content, string $message)
     {
         if (isset($e)) {
             throw new BadRequestHttpException($e->getMessage());
