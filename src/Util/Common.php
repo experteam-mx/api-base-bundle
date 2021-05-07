@@ -12,6 +12,11 @@ use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 class Common
 {
@@ -111,5 +116,41 @@ class Common
     {
         $serializer = new Serializer([new DateTimeNormalizer(), new ObjectNormalizer(null, null, null, new ReflectionExtractor())]);
         return $serializer->denormalize($data, $type);
+    }
+
+    /**
+     * @param ClientExceptionInterface|DecodingExceptionInterface|RedirectionExceptionInterface|ServerExceptionInterface|TransportExceptionInterface|null $e
+     * @param string $message
+     */
+    public static function processHttpResponse($e, string $message)
+    {
+        if (isset($e)) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
+
+        if (!isset($content[Literal::STATUS])) {
+            throw new BadRequestHttpException($message);
+        }
+
+        $status = $content[Literal::STATUS];
+
+        if ($status !== Literal::SUCCESS) {
+            switch ($status) {
+                case 'fail':
+                    if (isset($content[Literal::DATA])) {
+                        $message = json_encode($content[Literal::DATA]);
+                    }
+
+                    break;
+                case 'error':
+                    if (isset($content[Literal::MESSAGE])) {
+                        $message = $content[Literal::MESSAGE];
+                    }
+
+                    break;
+            }
+
+            throw new BadRequestHttpException($message);
+        }
     }
 }
