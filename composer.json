@@ -12,8 +12,8 @@
     "require": {
         "php": "^7.3",
         "ext-json": "*",
-        "doctrine/orm": "2.7.*",
-        "doctrine/doctrine-bundle": "2.0.*|2.2.*",
+        "doctrine/orm": "^2.0",
+        "doctrine/doctrine-bundle": "^2.0",
         "doctrine/doctrine-fixtures-bundle": "^3.3",
         "symfony/serializer": "5.1.*|5.2.*",
         "symfony/config": "5.1.*|5.2.*",
