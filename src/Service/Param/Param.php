@@ -12,6 +12,8 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validation;
 
 class Param implements ParamInterface
 {
@@ -53,9 +55,9 @@ class Param implements ParamInterface
     {
         $result = [];
         $cfgParams = $this->parameterBag->get('experteam_api_base.params');
-        $url = (isset($cfgParams['remote_url']) ? $cfgParams['remote_url'] : null);
+        $url = ($cfgParams['remote_url'] ?? null);
 
-        if (filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED)) {
+        if (Validation::createValidator()->validate($url, [new Assert\Url(), new Assert\NotNull()])->count() == 0) {
             $token = $this->tokenStorage->getToken();
 
             if (!is_null($token)) {
