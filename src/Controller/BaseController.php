@@ -60,4 +60,14 @@ class BaseController extends AbstractFOSRestController
 
         return $session;
     }
+
+    /**
+     * @param mixed $data
+     * @return string
+     */
+    protected function jsonEncode($data): string
+    {
+        $jsonEncoder = new JsonEncoder();
+        return $jsonEncoder->encode($data, 'json');
+    }
 }
