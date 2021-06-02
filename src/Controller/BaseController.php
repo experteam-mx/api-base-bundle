@@ -62,10 +62,10 @@ class BaseController extends AbstractFOSRestController
     }
 
     /**
-     * @param array $data
+     * @param mixed $data
      * @return string
      */
-    protected function jsonEncode(array $data): string
+    protected function jsonEncode($data): string
     {
         $jsonEncoder = new JsonEncoder();
         return $jsonEncoder->encode($data, 'json');
