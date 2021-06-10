@@ -154,4 +154,27 @@ class Common
             throw new BadRequestHttpException($message);
         }
     }
+
+    /**
+     * @param DateTime $dateTime
+     * @return string
+     */
+    public static function getMaxCollectionDate(DateTime $dateTime): string
+    {
+        $sum1 = 2;
+        $dia = $dateTime->format('w');
+
+        switch ($dia) {
+            case '4':
+            case '5':
+                $sum1 = 4;
+                break;
+            case '6':
+                $sum1 = 3;
+                break;
+        }
+
+        $dateTime->modify("+{$sum1} days");
+        return $dateTime->format('d/m/Y');
+    }
 }
