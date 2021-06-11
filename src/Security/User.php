@@ -20,6 +20,14 @@ class User implements UserInterface
 
     private $roles = [];
 
+    private $model_type;
+
+    private $model_id;
+
+    private $auth_type;
+
+    private $language_id;
+
     /**
      * @var array
      */
@@ -155,5 +163,92 @@ class User implements UserInterface
     public function getSession(): ?array
     {
         return $this->session;
+    }
+
+    /**
+     * @param array|null $session
+     * @return $this
+     */
+    public function setSession(?array $session): self
+    {
+        $this->session = $session;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getModelType(): ?int
+    {
+        return $this->model_type;
+    }
+
+    /**
+     * @param int|null $model_type
+     * @return $this
+     */
+    public function setModelType(?int $model_type): self
+    {
+        $this->model_type = $model_type;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getModelId(): ?int
+    {
+        return $this->model_id;
+    }
+
+    /**
+     * @param int|null $model_id
+     * @return $this
+     */
+    public function setModelId(?int $model_id): self
+    {
+        $this->model_id = $model_id;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAuthType(): ?string
+    {
+        return $this->auth_type;
+    }
+
+    /**
+     * @param string|null $auth_type
+     * @return $this
+     */
+    public function setAuthType(?string $auth_type): self
+    {
+        $this->auth_type = $auth_type;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getLanguageId(): ?int
+    {
+        return $this->language_id;
+    }
+
+    /**
+     * @param int|null $language_id
+     * @return $this
+     */
+    public function setLanguageId(?int $language_id): self
+    {
+        $this->language_id = $language_id;
+
+        return $this;
     }
 }
