@@ -177,18 +177,18 @@ class User implements UserInterface
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getModelType(): ?int
+    public function getModelType(): ?string
     {
         return $this->model_type;
     }
 
     /**
-     * @param int|null $model_type
+     * @param string|null $model_type
      * @return $this
      */
-    public function setModelType(?int $model_type): self
+    public function setModelType(?string $model_type): self
     {
         $this->model_type = $model_type;
 
