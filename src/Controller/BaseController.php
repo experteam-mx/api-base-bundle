@@ -8,6 +8,7 @@ use Experteam\ApiBaseBundle\Service\RequestUtil\RequestUtilInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class BaseController extends AbstractFOSRestController
 {
@@ -22,13 +23,20 @@ class BaseController extends AbstractFOSRestController
     protected $requestUtil;
 
     /**
+     * @var HttpClientInterface
+     */
+    protected $httpClient;
+
+    /**
      * @param ParamInterface $param
      * @param RequestUtilInterface $requestUtil
+     * @param HttpClientInterface $httpClient
      */
-    public function __construct(ParamInterface $param, RequestUtilInterface $requestUtil)
+    public function __construct(ParamInterface $param, RequestUtilInterface $requestUtil, HttpClientInterface $httpClient)
     {
         $this->param = $param;
         $this->requestUtil = $requestUtil;
+        $this->httpClient = $httpClient;
     }
 
     /**
