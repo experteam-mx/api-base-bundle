@@ -89,7 +89,16 @@ class Param implements ParamInterface
 
         if (empty($result)) {
             foreach ($values as $v) {
-                $result[$v] = $cfgParams['defaults'][$v] ?? null;
+                $default = $cfgParams['defaults'][$v] ?? null;
+
+                if (!is_null($default) && is_string($default)) {
+                    $value = json_decode(sprintf('{"v": %s}', $default), true);
+                    if (json_last_error() != JSON_ERROR_NONE)
+                        $value = json_decode(sprintf('{"v": "%s"}', str_replace('"', '\"', $default)), true);
+                    $default = $value['v'];
+                }
+
+                $result[$v] = $default;
             }
         }
 
