@@ -2,14 +2,36 @@
 
 namespace Experteam\ApiBaseBundle\Service\JSend;
 
+use Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface;
 use FOS\RestBundle\Exception\InvalidParameterException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class JSend implements JSendInterface
 {
+    /**
+     * @var ELKLoggerInterface
+     */
+    protected $logger;
+    /**
+     * @var RequestStack
+     */
+    protected  $requestStack;
+    /**
+     * @var ParameterBagInterface
+     */
+    protected $parameterBag;
+
+    public function __construct(ELKLoggerInterface $elkLogger, RequestStack $requestStack, ParameterBagInterface $parameterBag)
+    {
+        $this->logger = $elkLogger;
+        $this->requestStack = $requestStack;
+        $this->parameterBag = $parameterBag;
+    }
 
     /**
      * @param ResponseEvent $event
@@ -107,5 +129,17 @@ class JSend implements JSendInterface
                 'code' => $e->getStatusCode(),
                 'message' => $e->getMessage()
             ], $e->getStatusCode()));
+
+        /*
+         * Send error log to kibana
+         */
+        $prefix = $this->parameterBag->get('app.prefix');
+        $request = $this->requestStack->getCurrentRequest();
+        $this->logger->errorLog("{$prefix}_exception", [
+            'request_url' => !is_null($request) ? $request->getUri() : null,
+            'request_body' => !is_null($request) ? $request->getContent() : null,
+            'error_code' => $e->getStatusCode(),
+            'error_message' => $e->getMessage()
+        ]);
     }
 }

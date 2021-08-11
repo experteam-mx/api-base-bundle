@@ -12,7 +12,11 @@
 
         <service id="Predis\Client" alias="snc_redis.default" />
 
-        <service id="api_base.jsend" class="Experteam\ApiBaseBundle\Service\JSend\JSend" public="true" />
+        <service id="api_base.jsend" class="Experteam\ApiBaseBundle\Service\JSend\JSend" public="true" >
+            <argument key="$elkLogger" type="service" id="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface"/>
+            <argument key="$requestStack" type="service" id="Symfony\Component\HttpFoundation\RequestStack"/>
+            <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
+        </service>
         <service id="Experteam\ApiBaseBundle\Service\JSend\JSendInterface" alias="api_base.jsend" />
 
         <service id="api_base.param" class="Experteam\ApiBaseBundle\Service\Param\Param" public="true">
