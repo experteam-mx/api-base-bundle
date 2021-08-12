@@ -116,6 +116,8 @@ class JSend implements JSendInterface
     public function onKernelException(ExceptionEvent $event)
     {
         $e = $event->getThrowable();
+        $code_error = null;
+
         if ($e instanceof InvalidParameterException) {
             $message = sprintf('Invalid parameter "%s". %s', $e->getParameter()->name, $e->getViolations()[0]->getMessage());
             $event->setThrowable($e = new BadRequestHttpException($message));
@@ -124,11 +126,14 @@ class JSend implements JSendInterface
         /*
          * Keeps the error message in production environment
          */
-        if ($e instanceof BadRequestHttpException)
+        if ($e instanceof BadRequestHttpException){
             $event->setResponse(new JsonResponse([
                 'code' => $e->getStatusCode(),
                 'message' => $e->getMessage()
             ], $e->getStatusCode()));
+
+            $code_error = $e->getStatusCode();
+        }
 
         /*
          * Send error log to kibana
@@ -138,7 +143,7 @@ class JSend implements JSendInterface
         $this->logger->errorLog("{$prefix}_exception", [
             'request_url' => !is_null($request) ? $request->getUri() : null,
             'request_body' => !is_null($request) ? $request->getContent() : null,
-            'error_code' => $e->getStatusCode(),
+            'error_code' => $code_error,
             'error' => $e->getMessage()
         ]);
     }
