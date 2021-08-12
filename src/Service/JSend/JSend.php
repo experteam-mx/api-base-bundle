@@ -139,7 +139,7 @@ class JSend implements JSendInterface
             'request_url' => !is_null($request) ? $request->getUri() : null,
             'request_body' => !is_null($request) ? $request->getContent() : null,
             'error_code' => $e->getStatusCode(),
-            'error_message' => $e->getMessage()
+            'error' => $e->getMessage()
         ]);
     }
 }
