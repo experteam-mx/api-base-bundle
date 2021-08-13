@@ -8,7 +8,7 @@ trait GmtOffsetEntity
 {
     /**
      * @var string
-     * @ORM\Column(type="string", length="25")
+     * @ORM\Column(type="string", length=50)
      */
     private $gmtOffset;
 
