@@ -36,6 +36,12 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('release')->defaultValue('0')->end()
                     ->end()
                 ->end()
+                ->arrayNode('timezone')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('default')->defaultValue('+00:00')->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;
