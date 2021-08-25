@@ -46,23 +46,25 @@ class ELKLogger implements ELKLoggerInterface
         if (!isset($this->context)) {
             $cfgParams = $this->parameterBag->get('experteam_api_base.elk_logger');
             $request = $this->requestStack->getCurrentRequest();
-            $transactionId = !is_null($request) ? $request->get('transaction_id') : null;
+            $transactionId = (!is_null($request) ? $request->get('transaction_id') : null);
 
             $this->context = [
-                'id' => empty($transactionId) ? uniqid() : $transactionId,
+                'id' => (empty($transactionId) ? uniqid() : $transactionId),
                 'channel' => $cfgParams['channel'],
                 'timestamp' => date_create()
             ];
 
             $token = $this->tokenStorage->getToken();
+
             if (!is_null($token)) {
-                /** @var User $user */
                 $user = $token->getUser();
 
-                $this->context['user'] = [
-                    'id' => $user->getId(),
-                    'username' => $user->getUsername()
-                ];
+                if ($user instanceof User) {
+                    $this->context['user'] = [
+                        'id' => $user->getId(),
+                        'username' => $user->getUsername()
+                    ];
+                }
             }
         }
 
