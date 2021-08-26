@@ -13,10 +13,18 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 {
+    const REDIS_TOKEN = 'security.token';
+    const REDIS_APP_KEY = 'security.appkey';
+
     /**
      * @var Client
      */
     private $predisClient;
+
+    /**
+     * @var string
+     */
+    private $redisKey = self::REDIS_TOKEN;
 
     public function __construct(Client $predisClient)
     {
@@ -25,22 +33,30 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 
     public function supports(Request $request)
     {
-        // look for header "Authorization: Bearer <token>"
+        // look for header "Authorization: Bearer <token>" or "AppKey: <key>"
         return (!isset($_ENV['APP_SECURITY_ACCESS_ROLE']) || $_ENV['APP_SECURITY_ACCESS_ROLE'] !== 'IS_ANONYMOUS')
-            && $request->headers->has('Authorization')
-            && 0 === strpos($request->headers->get('Authorization'), 'Bearer ');
+            && (($request->headers->has('Authorization')
+                    && 0 === strpos($request->headers->get('Authorization'), 'Bearer '))
+                || $request->headers->has('AppKey'));
     }
 
     public function getCredentials(Request $request)
     {
         // skip beyond "Bearer "
-        return substr($request->headers->get('Authorization'), 7);
+        $credentials = substr($request->headers->get('Authorization'), 7);
+
+        if ($credentials === false) {
+            $credentials = $request->headers->get('AppKey');
+            $this->redisKey = self::REDIS_APP_KEY;
+        }
+
+        return $credentials;
     }
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         $user = null;
-        $data = json_decode($this->predisClient->get("security.token:{$credentials}"), true);
+        $data = json_decode($this->predisClient->get("{$this->redisKey}:{$credentials}"), true);
 
         if (!is_null($data)) {
             $data['token'] = $credentials;
