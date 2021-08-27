@@ -13,8 +13,8 @@ use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 
 class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 {
-    const REDIS_TOKEN = 'security.token';
-    const REDIS_APP_KEY = 'security.appkey';
+    const AUTH_TOKEN = 0;
+    const AUTH_APP_KEY = 1;
 
     /**
      * @var Client
@@ -22,9 +22,9 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
     private $predisClient;
 
     /**
-     * @var string
+     * @var int
      */
-    private $redisKey = self::REDIS_TOKEN;
+    private $authType = self::AUTH_TOKEN;
 
     public function __construct(Client $predisClient)
     {
@@ -47,7 +47,7 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 
         if ($credentials === false) {
             $credentials = $request->headers->get('AppKey');
-            $this->redisKey = self::REDIS_APP_KEY;
+            $this->authType = self::AUTH_APP_KEY;
         }
 
         return $credentials;
@@ -56,10 +56,11 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         $user = null;
-        $data = json_decode($this->predisClient->get("{$this->redisKey}:{$credentials}"), true);
+        $redisKey = $this->authType == self::AUTH_TOKEN ? 'security.token' : 'security.appkey';
+        $data = json_decode($this->predisClient->get("{$redisKey}:{$credentials}"), true);
 
         if (!is_null($data)) {
-            $data['token'] = $credentials;
+            $data[$this->authType == self::AUTH_TOKEN ? 'token' : 'appkey'] = $credentials;
 
             if (isset($data['permissions'])) {
                 $data['roles'] = [];

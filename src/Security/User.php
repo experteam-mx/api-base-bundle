@@ -18,6 +18,8 @@ class User implements UserInterface
 
     private $token;
 
+    private $appkey;
+
     private $roles = [];
 
     private $model_type;
@@ -248,6 +250,18 @@ class User implements UserInterface
     public function setLanguageId(?int $language_id): self
     {
         $this->language_id = $language_id;
+
+        return $this;
+    }
+
+    public function getAppkey(): ?string
+    {
+        return $this->appkey;
+    }
+
+    public function setAppkey($appkey): self
+    {
+        $this->appkey = $appkey;
 
         return $this;
     }
