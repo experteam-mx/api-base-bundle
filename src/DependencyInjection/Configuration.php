@@ -42,6 +42,12 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default')->defaultValue('+00:00')->end()
                     ->end()
                 ->end()
+                ->arrayNode('appkey')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('enabled')->defaultValue(true)->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;
