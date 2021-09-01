@@ -4,6 +4,7 @@ namespace Experteam\ApiBaseBundle\Security;
 
 use Predis\Client;
 use Exception;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -22,22 +23,27 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
     private $predisClient;
 
     /**
+     * @var array
+     */
+    private $appKeyConfig;
+
+    /**
      * @var int
      */
     private $authType = self::AUTH_TOKEN;
 
-    public function __construct(Client $predisClient)
+    public function __construct(Client $predisClient, ParameterBagInterface $parameterBag)
     {
         $this->predisClient = $predisClient;
+        $this->appKeyConfig = $parameterBag->get('experteam_api_base.appkey');
     }
 
     public function supports(Request $request)
     {
         // look for header "Authorization: Bearer <token>" or "AppKey: <key>"
         return (!isset($_ENV['APP_SECURITY_ACCESS_ROLE']) || $_ENV['APP_SECURITY_ACCESS_ROLE'] !== 'IS_ANONYMOUS')
-            && (($request->headers->has('Authorization')
-                    && 0 === strpos($request->headers->get('Authorization'), 'Bearer '))
-                || $request->headers->has('AppKey'));
+            && (($request->headers->has('Authorization') && 0 === strpos($request->headers->get('Authorization'), 'Bearer '))
+                || ($this->appKeyConfig['enabled'] && $request->headers->has('AppKey')));
     }
 
     public function getCredentials(Request $request)
