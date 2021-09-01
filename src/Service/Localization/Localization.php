@@ -95,7 +95,7 @@ class Localization implements LocalizationInterface
      */
     public function processGmtOffset(object $object)
     {
-        if (in_array(GmtOffsetEntity::class, class_uses($object)))
+        if (in_array(GmtOffsetEntity::class, class_uses($object)) && is_null($object->getGmtOffset()))
             $object->setGmtOffset($this->getDefaultTimezone());
     }
 
@@ -105,7 +105,7 @@ class Localization implements LocalizationInterface
      */
     public function processLocalCreatedAt(object $object)
     {
-        if (in_array(LocalCreatedAtEntity::class, class_uses($object)))
+        if (in_array(LocalCreatedAtEntity::class, class_uses($object)) && is_null($object->getLocalCreatedAt()))
             $object->setLocalCreatedAt(date_create('now', new DateTimeZone($this->getDefaultTimezone())));
     }
 
@@ -115,7 +115,7 @@ class Localization implements LocalizationInterface
      */
     public function processLocalUpdatedAt(object $object)
     {
-        if (in_array(LocalUpdatedAtEntity::class, class_uses($object)))
+        if (in_array(LocalUpdatedAtEntity::class, class_uses($object)) && is_null($object->getLocalUpdatedAt()))
             $object->setLocalUpdatedAt(date_create('now', new DateTimeZone($this->getDefaultTimezone())));
     }
 }
