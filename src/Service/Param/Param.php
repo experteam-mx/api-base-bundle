@@ -66,14 +66,17 @@ class Param implements ParamInterface
 
                 if ($user instanceof User) {
                     try {
-                        $response = $this->client->request('POST', $url, [
-                            'auth_bearer' => $user->getToken(),
+                        $authentication = !is_null($user->getToken())
+                            ? ['auth_bearer' => $user->getToken()]
+                            : ['headers' => ['AppKey' => $user->getAppkey()]];
+
+                        $response = $this->client->request('POST', $url, array_merge([
                             'body' => [
                                 'parameters' => array_map(function ($v) {
                                     return ['name' => $v];
                                 }, $values)
                             ]
-                        ])->toArray(false);
+                        ], $authentication))->toArray(false);
                     } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
                         throw new Exception('ExperteamApiBaseBundle: Error connecting to remote url params.');
                     }
