@@ -23,7 +23,7 @@
         "symfony/dependency-injection": "5.2.*|5.3.*",
         "symfony/http-client": "5.2.*|5.3.*",
         "symfony/http-kernel": "5.2.*|5.3.*",
-        "symfony/security-bundle": "5.3.*",
+        "symfony/security-bundle": "5.2.*|5.3.*",
         "symfony/security-core": "5.2.*|5.3.*",
         "symfony/security-guard": "5.2.*|5.3.*",
         "symfony/serializer": "5.2.*|5.3.*",
