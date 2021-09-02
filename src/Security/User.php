@@ -42,9 +42,9 @@ class User implements UserInterface
         }
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
-        return (int)$this->id;
+        return $this->id;
     }
 
     public function setId(int $id): self
@@ -54,9 +54,9 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
-        return (string)$this->name;
+        return $this->name;
     }
 
     public function setName(string $name): self
@@ -71,9 +71,9 @@ class User implements UserInterface
      *
      * @see UserInterface
      */
-    public function getUsername(): string
+    public function getUsername(): ?string
     {
-        return (string)$this->username;
+        return $this->username;
     }
 
     public function setUsername(string $username): self
@@ -83,9 +83,9 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getCreatedAt(): string
+    public function getCreatedAt(): ?string
     {
-        return (string)$this->created_at;
+        return $this->created_at;
     }
 
     public function setCreatedAt(string $created_at): self
@@ -95,9 +95,9 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getUpdatedAt(): string
+    public function getUpdatedAt(): ?string
     {
-        return (string)$this->updated_at;
+        return $this->updated_at;
     }
 
     public function setUpdatedAt(string $updated_at): self
@@ -107,9 +107,9 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getToken(): string
+    public function getToken(): ?string
     {
-        return (string)$this->token;
+        return $this->token;
     }
 
     public function setToken(string $token): self
