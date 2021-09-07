@@ -12,7 +12,7 @@ use Throwable;
 class UpgradeDoctrineMigrationsCommand extends Command
 {
     private $entityManager;
-    protected static $defaultName = 'app:upgrade-doctrine-migrations';
+    protected static $defaultName = 'experteam:doctrine:migrations:upgrade';
     protected static $defaultDescription = 'Upgrade doctrine migrations';
 
     public function __construct(EntityManagerInterface $entityManager)
