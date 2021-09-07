@@ -1,39 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<container xmlns="http://symfony.com/schema/dic/services"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://symfony.com/schema/dic/services
-        http://symfony.com/schema/dic/services/services-1.0.xsd">
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
-        <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container" />
+        <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container"/>
 
         <service id="api_base.token_authenticator"  class="Experteam\ApiBaseBundle\Security\ApiTokenAuthenticator">
             <argument key="$predisClient" type="service" id="Predis\Client"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
         </service>
 
-        <service id="api_base.user_provider" class="Experteam\ApiBaseBundle\Security\UserProvider" />
+        <service id="api_base.user_provider" class="Experteam\ApiBaseBundle\Security\UserProvider"/>
 
-        <service id="Predis\Client" alias="snc_redis.default" />
+        <service id="Predis\Client" alias="snc_redis.default"/>
 
-        <service id="api_base.jsend" class="Experteam\ApiBaseBundle\Service\JSend\JSend" public="true" >
+        <service id="api_base.jsend" class="Experteam\ApiBaseBundle\Service\JSend\JSend" public="true">
             <argument key="$elkLogger" type="service" id="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface"/>
             <argument key="$requestStack" type="service" id="Symfony\Component\HttpFoundation\RequestStack"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
         </service>
-        <service id="Experteam\ApiBaseBundle\Service\JSend\JSendInterface" alias="api_base.jsend" />
+        <service id="Experteam\ApiBaseBundle\Service\JSend\JSendInterface" alias="api_base.jsend"/>
 
         <service id="api_base.param" class="Experteam\ApiBaseBundle\Service\Param\Param" public="true">
             <argument key="$client" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
         </service>
-        <service id="Experteam\ApiBaseBundle\Service\Param\ParamInterface" alias="api_base.param" />
+        <service id="Experteam\ApiBaseBundle\Service\Param\ParamInterface" alias="api_base.param"/>
 
         <service id="api_base.request_util" class="Experteam\ApiBaseBundle\Service\RequestUtil\RequestUtil" public="true">
             <argument key="$serializer" type="service" id="Symfony\Component\Serializer\SerializerInterface"/>
             <argument key="$validator" type="service" id="Symfony\Component\Validator\Validator\ValidatorInterface"/>
         </service>
-        <service id="Experteam\ApiBaseBundle\Service\RequestUtil\RequestUtilInterface" alias="api_base.request_util" />
+        <service id="Experteam\ApiBaseBundle\Service\RequestUtil\RequestUtilInterface" alias="api_base.request_util"/>
 
         <service id="api_base.elk_logger" class="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLogger" public="true">
             <argument key="$logger" type="service" id="Psr\Log\LoggerInterface"/>
@@ -41,14 +38,14 @@
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
         </service>
-        <service id="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface" alias="api_base.elk_logger" />
+        <service id="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface" alias="api_base.elk_logger"/>
 
         <service id="api_base.localization" class="Experteam\ApiBaseBundle\Service\Localization\Localization" public="true">
             <argument key="$container" type="service" id="Symfony\Component\DependencyInjection\ContainerInterface"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
         </service>
-        <service id="Experteam\ApiBaseBundle\Service\Localization\LocalizationInterface" alias="api_base.localization" />
+        <service id="Experteam\ApiBaseBundle\Service\Localization\LocalizationInterface" alias="api_base.localization"/>
 
         <service id="api_base.authenticate" class="Experteam\ApiBaseBundle\Service\Authenticate\Authenticate" public="true">
             <argument key="$httpClient" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
@@ -56,11 +53,16 @@
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
             <argument key="$predisClient" type="service" id="Predis\Client"/>
         </service>
-        <service id="Experteam\ApiBaseBundle\Service\Authenticate\AuthenticateInterface" alias="api_base.authenticate" />
+        <service id="Experteam\ApiBaseBundle\Service\Authenticate\AuthenticateInterface" alias="api_base.authenticate"/>
 
         <service id="api_base.fixtures_load_command" class="Experteam\ApiBaseBundle\Command\LoadFixturesCommand">
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
-            <tag name="console.command" command="experteam:fixtures:load" />
+            <tag name="console.command" command="experteam:fixtures:load"/>
+        </service>
+
+        <service id="Experteam\ApiBaseBundle\Command\UpgradeDoctrineMigrationsCommand">
+            <argument key="$entityManager" type="service" id="Doctrine\ORM\EntityManagerInterface"/>
+            <tag name="console.command" command="experteam:doctrine:migrations:upgrade"/>
         </service>
     </services>
 </container>
