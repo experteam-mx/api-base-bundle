@@ -32,6 +32,7 @@ class UpgradeDoctrineMigrationsCommand extends Command
             $connection->executeQuery('DROP TABLE migration_versions');
         } catch (Throwable $t) {
             $io->error($t->getMessage());
+            return Command::FAILURE;
         }
 
         $io->success('Successfully upgraded doctrine migrations.');
