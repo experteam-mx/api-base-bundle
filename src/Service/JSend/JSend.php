@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class JSend implements JSendInterface
 {
@@ -116,7 +117,7 @@ class JSend implements JSendInterface
     public function onKernelException(ExceptionEvent $event)
     {
         $e = $event->getThrowable();
-        $code_error = null;
+        $errorCode = null;
 
         if ($e instanceof InvalidParameterException) {
             $message = sprintf('Invalid parameter "%s". %s', $e->getParameter()->name, $e->getViolations()[0]->getMessage());
@@ -126,13 +127,12 @@ class JSend implements JSendInterface
         /*
          * Keeps the error message in production environment
          */
-        if ($e instanceof BadRequestHttpException){
+        if ($e instanceof HttpException || $e->getMessage() == 'Unauthorized.') {
+            $errorCode = $e instanceof HttpException ? $e->getStatusCode() : 500;
             $event->setResponse(new JsonResponse([
-                'code' => $e->getStatusCode(),
+                'code' => $errorCode,
                 'message' => $e->getMessage()
-            ], $e->getStatusCode()));
-
-            $code_error = $e->getStatusCode();
+            ], $errorCode));
         }
 
         /*
@@ -143,7 +143,7 @@ class JSend implements JSendInterface
         $this->logger->errorLog("{$prefix}_exception", [
             'request_url' => !is_null($request) ? $request->getUri() : null,
             'request_body' => !is_null($request) ? $request->getContent() : null,
-            'error_code' => $code_error,
+            'error_code' => $errorCode,
             'error' => $e->getMessage()
         ]);
     }
