@@ -55,6 +55,12 @@
         </service>
         <service id="Experteam\ApiBaseBundle\Service\Authenticate\AuthenticateInterface" alias="api_base.authenticate"/>
 
+        <service id="api_base.entity_config" class="Experteam\ApiBaseBundle\Service\EntityConfig\EntityConfig" public="true">
+            <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
+            <argument key="$predisClient" type="service" id="Predis\Client"/>
+        </service>
+        <service id="Experteam\ApiBaseBundle\Service\EntityConfig\EntityConfigInterface" alias="api_base.entity_config"/>
+
         <service id="api_base.fixtures_load_command" class="Experteam\ApiBaseBundle\Command\LoadFixturesCommand">
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
             <tag name="console.command" command="experteam:fixtures:load"/>
