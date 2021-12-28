@@ -61,6 +61,13 @@
         </service>
         <service id="Experteam\ApiBaseBundle\Service\EntityConfig\EntityConfigInterface" alias="api_base.entity_config"/>
 
+        <service id="api_base.http_client" class="Experteam\ApiBaseBundle\Service\HttpClient\HttpClient" public="true">
+            <argument key="$httpClient" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
+            <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
+            <argument key="$validator" type="service" id="Symfony\Component\Validator\Validator\ValidatorInterface"/>
+        </service>
+        <service id="Experteam\ApiBaseBundle\Service\HttpClient\HttpClientInterface" alias="api_base.http_client"/>
+
         <service id="api_base.fixtures_load_command" class="Experteam\ApiBaseBundle\Command\LoadFixturesCommand">
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
             <tag name="console.command" command="experteam:fixtures:load"/>
