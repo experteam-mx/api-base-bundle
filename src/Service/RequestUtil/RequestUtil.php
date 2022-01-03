@@ -8,6 +8,7 @@ use PhpDocReader\PhpDocReader;
 use ReflectionClass;
 use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -45,9 +46,12 @@ class RequestUtil implements RequestUtilInterface
         $this->validateDataTypes($data, $model);
 
         try {
-            $object = $this->serializer->deserialize($data, $model, 'json');
+            $object = $this->serializer->deserialize($data, $model, 'json', [
+                AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true
+            ]);
         } catch (Exception $e) {
-            throw new BadRequestHttpException('Invalid body.');
+            $message = $e->getMessage();
+            throw new BadRequestHttpException("Invalid body: $message" . ((substr($message, -1) == '.') ? '' : '.'));
         }
 
         $errors = $this->validator->validate($object);
@@ -74,7 +78,7 @@ class RequestUtil implements RequestUtilInterface
      */
     protected function validateDataTypes(string $data, string $model, bool $throwException = true)
     {
-        $validationTypes  = $this->getValidationTypes($model);
+        $validationTypes = $this->getValidationTypes($model);
         $constraints = new Assert\Collection($validationTypes);
         $constraints->allowExtraFields = true;
         $constraints->allowMissingFields = true;
@@ -132,7 +136,7 @@ class RequestUtil implements RequestUtilInterface
                     ];
                 } elseif (class_exists($childType)) {
                     $_validationTypes = $this->getValidationTypes($childType);
-                    $_collection  = new Assert\Collection($_validationTypes);
+                    $_collection = new Assert\Collection($_validationTypes);
                     $_collection->allowMissingFields = true;
                     $_collection->allowExtraFields = true;
                     $validationTypes[$fieldName] = $_collection;
