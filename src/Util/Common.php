@@ -177,4 +177,13 @@ class Common
         $dateTime->modify("+{$sum1} days");
         return $dateTime->format('d/m/Y');
     }
+
+    /**
+     * @return float
+     */
+    public static function microtime(): float
+    {
+        list($usec, $sec) = explode(' ', microtime());
+        return floatval($usec) + floatval($sec);
+    }
 }
