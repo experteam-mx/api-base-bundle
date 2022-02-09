@@ -5,6 +5,7 @@ namespace Experteam\ApiBaseBundle\Util;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use Experteam\ApiBaseBundle\Security\User;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -17,6 +18,7 @@ use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class Common
 {
@@ -185,5 +187,66 @@ class Common
     {
         list($usec, $sec) = explode(' ', microtime());
         return floatval($usec) + floatval($sec);
+    }
+
+    /**
+     * @param HttpClientInterface $httpClient
+     * @param string $method
+     * @param string $url
+     * @param User $user
+     * @param string $body
+     * @param array $result
+     * @param bool $checkData
+     * @return array
+     */
+    public static function httpRequest(HttpClientInterface $httpClient, string $method, string $url, User $user, string $body, array $result = [Literal::SUCCESS => false], bool $checkData = true): array
+    {
+        try {
+            $response = $httpClient->request($method, $url, [
+                'auth_bearer' => $user->getToken(),
+                'body' => $body
+            ]);
+
+            $content = $response->toArray(false);
+        } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
+        }
+
+        if (isset($e)) {
+            $result[Literal::MESSAGE] = $e->getMessage();
+            return $result;
+        }
+
+        if (!isset($content[Literal::STATUS])) {
+            return $result;
+        }
+
+        $status = $content[Literal::STATUS];
+
+        if ($status !== Literal::SUCCESS) {
+            switch ($status) {
+                case 'fail':
+                    if (isset($content[Literal::DATA])) {
+                        $result[Literal::MESSAGE] = json_encode($content[Literal::DATA]);
+                    }
+
+                    break;
+                case 'error':
+                    if (isset($content[Literal::MESSAGE])) {
+                        $result[Literal::MESSAGE] = $content[Literal::MESSAGE];
+                    }
+
+                    break;
+            }
+
+            return $result;
+        }
+
+        if ($checkData && !isset($content[Literal::DATA])) {
+            return $result;
+        }
+
+        $result[Literal::SUCCESS] = true;
+        $result['content'] = $content;
+        return $result;
     }
 }
