@@ -197,9 +197,10 @@ class Common
      * @param string $body
      * @param array $result
      * @param bool $checkData
+     * @param string $serviceName
      * @return array
      */
-    public static function httpRequest(HttpClientInterface $httpClient, string $method, string $url, User $user, string $body, array $result = [Literal::SUCCESS => false], bool $checkData = true): array
+    public static function httpRequest(HttpClientInterface $httpClient, string $method, string $url, User $user, string $body, array $result = [Literal::SUCCESS => false], bool $checkData = true, string $serviceName = ''): array
     {
         try {
             $response = $httpClient->request($method, $url, [
@@ -211,8 +212,10 @@ class Common
         } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
         }
 
+        $messagePrefix = (empty($serviceName) ? '' : "$serviceName: ");
+
         if (isset($e)) {
-            $result[Literal::MESSAGE] = $e->getMessage();
+            $result[Literal::MESSAGE] = "$messagePrefix{$e->getMessage()}";
             return $result;
         }
 
@@ -232,7 +235,7 @@ class Common
                     break;
                 case 'error':
                     if (isset($content[Literal::MESSAGE])) {
-                        $result[Literal::MESSAGE] = $content[Literal::MESSAGE];
+                        $result[Literal::MESSAGE] = "$messagePrefix{$content[Literal::MESSAGE]}";
                     }
 
                     break;
