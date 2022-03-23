@@ -66,7 +66,7 @@ class JSend implements JSendInterface
                 $message = $data['message'];
             }
 
-            if (400 === $statusCode) {
+            if (in_array($statusCode, [400, 401, 403])) {
                 $status = 'fail';
 
                 if (isset($message)) {
