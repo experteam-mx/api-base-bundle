@@ -198,16 +198,22 @@ class Common
      * @param array $result
      * @param bool $checkData
      * @param string $serviceName
+     * @param array|null $headers
      * @return array
      */
-    public static function httpRequest(HttpClientInterface $httpClient, string $method, string $url, User $user, string $body, array $result = [Literal::SUCCESS => false], bool $checkData = true, string $serviceName = ''): array
+    public static function httpRequest(HttpClientInterface $httpClient, string $method, string $url, User $user, string $body, array $result = [Literal::SUCCESS => false], bool $checkData = true, string $serviceName = '', array $headers = null): array
     {
         try {
-            $response = $httpClient->request($method, $url, [
+            $options = [
                 'auth_bearer' => $user->getToken(),
                 'body' => $body
-            ]);
+            ];
 
+            if (!is_null($headers)) {
+                $options['headers'] = $headers;
+            }
+
+            $response = $httpClient->request($method, $url, $options);
             $content = $response->toArray(false);
         } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
         }
