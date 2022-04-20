@@ -80,18 +80,24 @@ class EntityConfig implements EntityConfigInterface
         ];
 
         $actives = [];
-        foreach ($fromRedis as [$key, $id]) {
-            $levelActives = $this->predisClient->hget($key, $id);
+        $inactives = [];
 
-            if (is_null($levelActives))
+        foreach ($fromRedis as [$key, $id]) {
+            $levelConfigured = $this->predisClient->hget($key, $id);
+
+            if (is_null($levelConfigured))
                 continue;
 
-            $levelActives = json_decode($levelActives, false);
+            $levelConfigured = json_decode($levelConfigured, true);
 
+            $levelActives = array_keys(array_filter($levelConfigured, function($v) { return $v; }));
             $actives = empty($actives) ? $levelActives : array_intersect($actives, $levelActives);
+
+            $levelInactives = array_keys(array_filter($levelConfigured, function($v) { return !$v; }));
+            $inactives = empty($inactives) ? $levelInactives : array_intersect($inactives, $levelInactives);
         }
 
-        return $actives;
+        return array_diff($actives, $inactives);
     }
 
 
