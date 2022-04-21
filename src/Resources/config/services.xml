@@ -16,6 +16,7 @@
             <argument key="$elkLogger" type="service" id="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface"/>
             <argument key="$requestStack" type="service" id="Symfony\Component\HttpFoundation\RequestStack"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
+            <argument key="$transaction" type="service" id="Experteam\ApiBaseBundle\Service\Transaction\TransactionInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\JSend\JSendInterface" alias="api_base.jsend"/>
 
