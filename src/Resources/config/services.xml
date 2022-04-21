@@ -12,11 +12,13 @@
 
         <service id="Predis\Client" alias="snc_redis.default"/>
 
+        <service id="api_base.transaction" class="Experteam\ApiBaseBundle\Service\Transaction\TransactionInterface" public="true"/>
+
         <service id="api_base.jsend" class="Experteam\ApiBaseBundle\Service\JSend\JSend" public="true">
             <argument key="$elkLogger" type="service" id="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface"/>
             <argument key="$requestStack" type="service" id="Symfony\Component\HttpFoundation\RequestStack"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
-            <argument key="$transaction" type="service" id="Experteam\ApiBaseBundle\Service\Transaction\TransactionInterface"/>
+            <argument key="$transaction" type="service" id="api_base.transaction"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\JSend\JSendInterface" alias="api_base.jsend"/>
 
@@ -78,7 +80,5 @@
             <argument key="$entityManager" type="service" id="Doctrine\ORM\EntityManagerInterface"/>
             <tag name="console.command" command="experteam:doctrine:migrations:upgrade"/>
         </service>
-
-        <service id="Experteam\ApiBaseBundle\Service\Transaction\TransactionInterface" alias="api_base.transaction"/>
     </services>
 </container>
