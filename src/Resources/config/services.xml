@@ -78,5 +78,7 @@
             <argument key="$entityManager" type="service" id="Doctrine\ORM\EntityManagerInterface"/>
             <tag name="console.command" command="experteam:doctrine:migrations:upgrade"/>
         </service>
+
+        <service id="Experteam\ApiBaseBundle\Service\Transaction\TransactionInterface" alias="api_base.transaction"/>
     </services>
 </container>
