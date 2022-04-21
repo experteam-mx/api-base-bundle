@@ -3,6 +3,7 @@
 namespace Experteam\ApiBaseBundle\Service\JSend;
 
 use Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface;
+use Experteam\ApiBaseBundle\Service\Transaction\TransactionInterface;
 use FOS\RestBundle\Exception\InvalidParameterException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,17 +22,24 @@ class JSend implements JSendInterface
     /**
      * @var RequestStack
      */
-    protected  $requestStack;
+    protected $requestStack;
+
     /**
      * @var ParameterBagInterface
      */
     protected $parameterBag;
 
-    public function __construct(ELKLoggerInterface $elkLogger, RequestStack $requestStack, ParameterBagInterface $parameterBag)
+    /**
+     * @var TransactionInterface
+     */
+    protected $transaction;
+
+    public function __construct(ELKLoggerInterface $elkLogger, RequestStack $requestStack, ParameterBagInterface $parameterBag, TransactionInterface $transaction)
     {
         $this->logger = $elkLogger;
         $this->requestStack = $requestStack;
         $this->parameterBag = $parameterBag;
+        $this->transaction = $transaction;
     }
 
     /**
@@ -77,6 +85,14 @@ class JSend implements JSendInterface
                     }
 
                     $message = null;
+                }
+
+                if (is_array($data)) {
+                    $transactionId = $this->transaction->getId(true);
+
+                    if (!is_null($transactionId)) {
+                        $data['transactionId'] = $transactionId;
+                    }
                 }
             } else {
                 $status = 'error';

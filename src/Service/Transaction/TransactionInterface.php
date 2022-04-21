@@ -5,9 +5,10 @@ namespace Experteam\ApiBaseBundle\Service\Transaction;
 interface TransactionInterface
 {
     /**
-     * @return string
+     * @param bool $justReturn
+     * @return string|null
      */
-    public function getId(): string;
+    public function getId(bool $justReturn = false): ?string;
 
     /**
      * @param string $field

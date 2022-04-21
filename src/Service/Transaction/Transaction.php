@@ -51,10 +51,15 @@ class Transaction implements TransactionInterface
     }
 
     /**
-     * @return string
+     * @param bool $justReturn
+     * @return string|null
      */
-    public function getId(): string
+    public function getId(bool $justReturn = false): ?string
     {
+        if ($justReturn) {
+            return $this->key;
+        }
+
         if (is_null($this->key)) {
             $this->key = ((is_null($this->request) || !$this->request->headers->has('Transaction-Id')) ? Uuid::v1()->toRfc4122() : $this->request->headers->get('Transaction-Id'));
         }
