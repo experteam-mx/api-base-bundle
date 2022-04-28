@@ -48,6 +48,12 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('enabled')->defaultValue(true)->end()
                     ->end()
                 ->end()
+                ->arrayNode('etag')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('enabled')->defaultValue(true)->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;

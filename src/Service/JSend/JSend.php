@@ -7,7 +7,9 @@ use Experteam\ApiBaseBundle\Service\Transaction\TransactionInterface;
 use FOS\RestBundle\Exception\InvalidParameterException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -63,6 +65,8 @@ class JSend implements JSendInterface
         if ('application/json' !== $response->headers->get('content-type')) {
             return;
         }
+
+        $this->configResponseETag($response, $request);
 
         $statusCode = $response->getStatusCode();
         $status = 'success';
@@ -162,5 +166,16 @@ class JSend implements JSendInterface
             'error_code' => $errorCode,
             'error' => $e->getMessage()
         ]);
+    }
+
+    protected function configResponseETag(Response $response, Request $request)
+    {
+        $enabled = $this->parameterBag->get('experteam_api_base.etag')['enabled'] ?? null;
+
+        if (is_bool($enabled) && $enabled) {
+            $response->setEtag(md5($response->getContent()));
+            $response->setPublic();
+            $response->isNotModified($request);
+        }
     }
 }
