@@ -45,17 +45,26 @@ class ChangeSet implements ChangeSetInterface
         $field = $options[$class][self::FIELD] ?? null;
         $group = $options[$class][self::GROUP] ?? 'read';
         $_object = $object;
+        $cascaded = false;
 
         if (!is_null($field)) {
             $method = 'get' . ucfirst($field);
             if (!method_exists($object, $method))
                 return;
-            
+
             $_object = $object->$method();
+
+            $objectMetadata = $this->manager->getClassMetadata(get_class($object));
+            $cascaded = in_array('persist', $objectMetadata->associationMappings[$field]['cascade'] ?? []);
         }
 
         $uow = $this->manager->getUnitOfWork();
-        $uow->computeChangeSets();
+        $_objectMetadata = $this->manager->getClassMetadata(get_class($_object));
+
+        if ($cascaded)
+            $this->manager->persist($_object);
+
+        $uow->computeChangeSet($_objectMetadata, $_object);
         $changes = $uow->getEntityChangeSet($_object);
 
         $object->setChangeSet($this->serializeWithCircularRefHandler($changes, [$group]));
