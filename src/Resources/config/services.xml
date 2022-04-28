@@ -86,5 +86,11 @@
             <argument key="$serializer" type="service" id="Symfony\Component\Serializer\SerializerInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\Transaction\TransactionInterface" alias="api_base.transaction"/>
+
+        <service id="api_base.change_set" class="Experteam\ApiBaseBundle\Service\ChangeSet\ChangeSet" public="true">
+            <argument key="$manager" type="service" id="Doctrine\ORM\EntityManagerInterface"/>
+            <argument key="$serializer" type="service" id="Symfony\Component\Serializer\SerializerInterface"/>
+        </service>
+        <service id="Experteam\ApiBaseBundle\Service\ChangeSet\ChangeSetInterface" alias="api_base.change_set"/>
     </services>
 </container>
