@@ -2,6 +2,7 @@
 
 namespace Experteam\ApiBaseBundle\Security;
 
+use Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface;
 use Predis\Client;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -24,6 +25,11 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
     private $predisClient;
 
     /**
+     * @var ELKLoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @var array
      */
     private $appKeyConfig;
@@ -33,10 +39,11 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
      */
     private $authType = self::AUTH_TOKEN;
 
-    public function __construct(Client $predisClient, ParameterBagInterface $parameterBag)
+    public function __construct(Client $predisClient, ParameterBagInterface $parameterBag, ELKLoggerInterface $elkLogger)
     {
         $this->predisClient = $predisClient;
         $this->appKeyConfig = $parameterBag->get('experteam_api_base.appkey');
+        $this->logger = $elkLogger;
     }
 
     public function supports(Request $request)
@@ -80,7 +87,8 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
             }
 
             $user = new User($data);
-        }
+        } else
+            $this->logger->infoLog('Failed Redis Credentials', ['rediskey' => "{$redisKey}:{$credentials}"]);
 
         return $user;
     }
