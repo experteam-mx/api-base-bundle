@@ -36,10 +36,9 @@ class ChangeSet implements ChangeSetInterface
     {
         $class = get_class($object);
 
-        if (!array_key_exists($class, $options))
-            return;
-
-        if (!in_array(ChangeSetEntity::class, class_uses($object)))
+        if (!array_key_exists($class, $options)
+            || !in_array(ChangeSetEntity::class, class_uses($object))
+            || !is_null($object->getChangeSet()))
             return;
 
         $field = $options[$class][self::FIELD] ?? null;
