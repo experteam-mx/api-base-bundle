@@ -22,6 +22,7 @@ class ExperteamApiBaseExtension extends Extension
         $container->setParameter('experteam_api_base.timezone', $config['timezone']);
         $container->setParameter('experteam_api_base.appkey', $config['appkey']);
         $container->setParameter('experteam_api_base.etag', $config['etag']);
+        $container->setParameter('experteam_api_base.auth', $config['auth']);
     }
 
 }

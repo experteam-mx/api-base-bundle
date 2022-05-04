@@ -4,9 +4,9 @@
         <service id="Symfony\Component\DependencyInjection\ContainerInterface" alias="service_container"/>
 
         <service id="api_base.token_authenticator"  class="Experteam\ApiBaseBundle\Security\ApiTokenAuthenticator">
-            <argument key="$predisClient" type="service" id="Predis\Client"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
             <argument key="$elkLogger" type="service" id="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface"/>
+            <argument key="$authenticate" type="service" id="Experteam\ApiBaseBundle\Service\Authenticate\AuthenticateInterface"/>
         </service>
 
         <service id="api_base.user_provider" class="Experteam\ApiBaseBundle\Security\UserProvider"/>

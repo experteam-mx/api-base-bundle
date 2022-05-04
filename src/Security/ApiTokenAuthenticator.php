@@ -2,8 +2,9 @@
 
 namespace Experteam\ApiBaseBundle\Security;
 
+use Experteam\ApiBaseBundle\Service\Authenticate\Authenticate;
+use Experteam\ApiBaseBundle\Service\Authenticate\AuthenticateInterface;
 use Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface;
-use Predis\Client;
 use Exception;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,21 +14,19 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Throwable;
 
 class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 {
-    const AUTH_TOKEN = 0;
-    const AUTH_APP_KEY = 1;
-
-    /**
-     * @var Client
-     */
-    private $predisClient;
-
     /**
      * @var ELKLoggerInterface
      */
     protected $logger;
+
+    /**
+     * @var AuthenticateInterface
+     */
+    protected $authenticate;
 
     /**
      * @var array
@@ -35,15 +34,21 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
     private $appKeyConfig;
 
     /**
+     * @var array
+     */
+    private $authConfig;
+
+    /**
      * @var int
      */
-    private $authType = self::AUTH_TOKEN;
+    private $authType = Authenticate::AUTH_TOKEN;
 
-    public function __construct(Client $predisClient, ParameterBagInterface $parameterBag, ELKLoggerInterface $elkLogger)
+    public function __construct(ParameterBagInterface $parameterBag, ELKLoggerInterface $elkLogger, AuthenticateInterface $authenticate)
     {
-        $this->predisClient = $predisClient;
         $this->appKeyConfig = $parameterBag->get('experteam_api_base.appkey');
+        $this->authConfig = $parameterBag->get('experteam_api_base.auth');
         $this->logger = $elkLogger;
+        $this->authenticate = $authenticate;
     }
 
     public function supports(Request $request)
@@ -61,7 +66,7 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
 
         if ($credentials === false) {
             $credentials = $request->headers->get('AppKey');
-            $this->authType = self::AUTH_APP_KEY;
+            $this->authType = Authenticate::AUTH_APP_KEY;
         }
 
         return $credentials;
@@ -70,25 +75,38 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         $user = null;
-        $redisKey = $this->authType == self::AUTH_TOKEN ? 'security.token' : 'security.appkey';
-        $data = json_decode($this->predisClient->get("{$redisKey}:{$credentials}"), true);
 
-        if (!is_null($data)) {
-            $data[$this->authType == self::AUTH_TOKEN ? 'token' : 'appkey'] = $credentials;
+        $fromRedis = $this->authConfig['from_redis'] ?? false;
+        if ($fromRedis) {
+            $user = $this->authenticate->getRedisUser($credentials, $this->authType);
 
-            if (isset($data['permissions'])) {
-                $data['roles'] = [];
+            if (is_null($user))
+                $this->logger->infoLog('Failed Redis Credentials', [
+                    'credentials' => $credentials,
+                    'authType' => $this->authType
+                ]);
+        }
 
-                foreach ($data['permissions'] as $permission) {
-                    array_push($data['roles'], 'ROLE_' . strtoupper($permission));
-                }
+        if (is_null($user)) {
+            $remoteUrl = $this->authConfig['remote_url'] ?? null;
 
-                unset($data['permissions']);
+            if (!is_null($remoteUrl)) {
+                /**
+                 * @var User $user
+                 * @var array $response
+                 * @var Throwable $exception
+                 */
+                [$user, $response, $exception] = $this->authenticate->getRemoteUser($credentials, $remoteUrl, $this->authType);
+
+                if (is_null($user))
+                    $this->logger->infoLog('Failed Remote Credentials', [
+                        'response' => $response,
+                        'url' => $remoteUrl,
+                        'authType' => $this->authType,
+                        'exception' => !is_null($exception) ? $exception->getMessage() : null
+                    ]);
             }
-
-            $user = new User($data);
-        } else
-            $this->logger->infoLog('Failed Redis Credentials', ['rediskey' => "{$redisKey}:{$credentials}"]);
+        }
 
         return $user;
     }
@@ -105,7 +123,7 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        throw new HttpException(401, 'Unauthorized.');
+        throw new HttpException($this->authConfig['status_code'] ?? 401, 'Unauthorized.');
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)

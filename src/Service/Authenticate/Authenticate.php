@@ -7,11 +7,6 @@ use Predis\Client;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 
@@ -19,7 +14,7 @@ class Authenticate implements AuthenticateInterface
 {
     const AUTH_TOKEN = 0;
     const AUTH_APP_KEY = 1;
-    
+
     /**
      * @var HttpClientInterface
      */
@@ -60,7 +55,7 @@ class Authenticate implements AuthenticateInterface
         if (is_null($token))
             return null;
 
-        $user = $this->getRedisUser($token, self::AUTH_TOKEN);
+        $user = $this->getRedisUser($token);
         if (is_null($user))
             return null;
 
@@ -75,7 +70,7 @@ class Authenticate implements AuthenticateInterface
      */
     public function loginWithToken(string $token): ?User
     {
-        $user = $this->getRedisUser($token, self::AUTH_TOKEN);
+        $user = $this->getRedisUser($token);
         if (is_null($user))
             return null;
 
@@ -85,7 +80,7 @@ class Authenticate implements AuthenticateInterface
     }
 
     /**
-     * @param string $appkey
+     * @param string $appKey
      * @return User|null
      */
     public function loginWithAppKey(string $appKey): ?User
@@ -136,31 +131,73 @@ class Authenticate implements AuthenticateInterface
     }
 
     /**
-     * @param string $token
+     * @param string $credentials
+     * @param int $authType
      * @return User|null
      */
-    protected function getRedisUser(string $credentials, int $authType): ?User
+    public function getRedisUser(string $credentials, int $authType = self::AUTH_TOKEN): ?User
     {
         $user = null;
         $redisKey = $authType == self::AUTH_TOKEN ? 'security.token' : 'security.appkey';
-        $data = json_decode($this->predisClient->get("{$redisKey}:{$credentials}"), true);
+        $data = json_decode($this->predisClient->get("$redisKey:$credentials"), true);
 
         if (!is_null($data)) {
-            $data[$authType == self::AUTH_TOKEN ? 'token' : 'appkey'] = $credentials;
-
-            if (isset($data['permissions'])) {
-                $data['roles'] = [];
-
-                foreach ($data['permissions'] as $permission) {
-                    array_push($data['roles'], 'ROLE_' . strtoupper($permission));
-                }
-
-                unset($data['permissions']);
-            }
-
+            $data = $this->formatUserData($credentials, $data, $authType);
             $user = new User($data);
         }
 
         return $user;
+    }
+
+    /**
+     * @param string $credentials
+     * @param string $url
+     * @param int $authType
+     * @return array [user, response, error]
+     */
+    public function getRemoteUser(string $credentials, string $url, int $authType = self::AUTH_TOKEN): array
+    {
+        $user = null;
+        $options = $authType == self::AUTH_TOKEN
+            ? ['auth_bearer' => $credentials]
+            : ['headers' => ['AppKey' => $credentials]];
+
+        try {
+            $response = $this->httpClient->request('GET', $url, $options)
+                ->toArray(false);
+        } catch (Throwable $e) {
+            return [null, null, $e];
+        }
+
+        $data = $response['data']['user'] ?? null;
+
+        if (!is_null($data)) {
+            $data = $this->formatUserData($credentials, $data, $authType);
+            $user = new User($data);
+        }
+
+        return [$user, $response, null];
+    }
+
+    /**
+     * @param string $credentials
+     * @param array $data
+     * @param int $authType
+     * @return array
+     */
+    protected function formatUserData(string $credentials, array $data, int $authType): array
+    {
+        $data[$authType == self::AUTH_TOKEN ? 'token' : 'appkey'] = $credentials;
+
+        if (isset($data['permissions'])) {
+            $data['roles'] = [];
+
+            foreach ($data['permissions'] as $permission)
+                $data['roles'][] = 'ROLE_' . strtoupper($permission);
+
+            unset($data['permissions']);
+        }
+
+        return $data;
     }
 }

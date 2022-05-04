@@ -54,6 +54,14 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('enabled')->defaultValue(true)->end()
                     ->end()
                 ->end()
+                ->arrayNode('auth')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('remote_url')->defaultValue(null)->end()
+                        ->scalarNode('from_redis')->defaultValue(true)->end()
+                        ->scalarNode('status_code')->defaultValue(401)->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;
