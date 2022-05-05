@@ -35,6 +35,13 @@ interface AuthenticateInterface
 
     /**
      * @param string $credentials
+     * @param int $authType
+     * @return string
+     */
+    public function getRedisKey(string $credentials, int $authType = Authenticate::AUTH_TOKEN): string;
+
+    /**
+     * @param string $credentials
      * @param string $url
      * @param int $authType
      * @return array [user, response, error]

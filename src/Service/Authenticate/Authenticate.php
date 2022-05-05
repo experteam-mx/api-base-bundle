@@ -138,8 +138,7 @@ class Authenticate implements AuthenticateInterface
     public function getRedisUser(string $credentials, int $authType = self::AUTH_TOKEN): ?User
     {
         $user = null;
-        $redisKey = $authType == self::AUTH_TOKEN ? 'security.token' : 'security.appkey';
-        $data = json_decode($this->predisClient->get("$redisKey:$credentials"), true);
+        $data = json_decode($this->predisClient->get($this->getRedisKey($credentials, $authType)), true);
 
         if (!is_null($data)) {
             $data = $this->formatUserData($credentials, $data, $authType);
@@ -147,6 +146,18 @@ class Authenticate implements AuthenticateInterface
         }
 
         return $user;
+    }
+
+    /**
+     * @param string $credentials
+     * @param int $authType
+     * @return string
+     */
+    public function getRedisKey(string $credentials, int $authType = self::AUTH_TOKEN): string
+    {
+        $prefix = $authType == self::AUTH_TOKEN ? 'security.token' : 'security.appkey';
+
+        return "$prefix:$credentials";
     }
 
     /**
