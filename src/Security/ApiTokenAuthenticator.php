@@ -14,6 +14,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validation;
 use Throwable;
 
 class ApiTokenAuthenticator extends AbstractGuardAuthenticator
@@ -90,7 +92,7 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
         if (is_null($user)) {
             $remoteUrl = $this->authConfig['remote_url'] ?? null;
 
-            if (!is_null($remoteUrl)) {
+            if (Validation::createValidator()->validate($remoteUrl, [new Assert\Url(), new Assert\NotBlank()])->count() == 0) {
                 /**
                  * @var User $user
                  * @var array $response
