@@ -13,6 +13,12 @@ interface JSendInterface
     public function onKernelResponse(ResponseEvent $event);
 
     /**
+     * @param ResponseEvent $event
+     * @return bool
+     */
+    public function isResponseSupports(ResponseEvent $event): bool;
+
+    /**
      * @param ExceptionEvent $event
      */
     public function onKernelException(ExceptionEvent $event);

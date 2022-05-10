@@ -17,10 +17,14 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class JSend implements JSendInterface
 {
+    const PATH_INFO = '/api/json';
+    const CONTENT_TYPE = 'application/json';
+
     /**
      * @var ELKLoggerInterface
      */
     protected $logger;
+
     /**
      * @var RequestStack
      */
@@ -49,22 +53,12 @@ class JSend implements JSendInterface
      */
     public function onKernelResponse(ResponseEvent $event)
     {
-        if (!$event->isMasterRequest()) {
+        if (!$this->isResponseSupports($event)) {
             return;
         }
 
         $request = $event->getRequest();
-        $pathInfo = $request->getPathInfo();
-
-        if ('/api/json' === $pathInfo) {
-            return;
-        }
-
         $response = $event->getResponse();
-
-        if ('application/json' !== $response->headers->get('content-type')) {
-            return;
-        }
 
         $this->configResponseETag($response, $request);
 
@@ -125,7 +119,7 @@ class JSend implements JSendInterface
 
         if ('GET' === $request->getMethod()) {
             $parameters = $request->query->all();
-            $headers['Content-Location'] = $pathInfo . (count($parameters) > 0 ? '?' . http_build_query($parameters) : '');
+            $headers['Content-Location'] = $request->getPathInfo() . (count($parameters) > 0 ? '?' . http_build_query($parameters) : '');
         }
 
         $response->headers->add($headers);
@@ -168,6 +162,10 @@ class JSend implements JSendInterface
         ]);
     }
 
+    /**
+     * @param Response $response
+     * @param Request $request
+     */
     protected function configResponseETag(Response $response, Request $request)
     {
         $enabled = $this->parameterBag->get('experteam_api_base.etag')['enabled'] ?? null;
@@ -177,5 +175,16 @@ class JSend implements JSendInterface
             $response->setPublic();
             $response->isNotModified($request);
         }
+    }
+
+    /**
+     * @param ResponseEvent $event
+     * @return bool
+     */
+    public function isResponseSupports(ResponseEvent $event): bool
+    {
+        return $event->isMasterRequest()
+            && $event->getRequest()->getPathInfo() !== self::PATH_INFO
+            && $event->getResponse()->headers->get('content-type') === self::CONTENT_TYPE;
     }
 }
