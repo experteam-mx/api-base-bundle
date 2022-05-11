@@ -59,10 +59,13 @@ class JSend implements JSendInterface
 
         $request = $event->getRequest();
         $response = $event->getResponse();
-
         $this->configResponseETag($response, $request);
-
         $statusCode = $response->getStatusCode();
+
+        if (304 === $statusCode) {
+            return;
+        }
+
         $status = 'success';
         $data = json_decode($response->getContent(), true);
         $message = null;
