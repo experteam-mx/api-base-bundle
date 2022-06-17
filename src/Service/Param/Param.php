@@ -85,6 +85,10 @@ class Param implements ParamInterface
                         foreach ($response['data']['parameters'] as $paramValue) {
                             $result[$paramValue['name']] = $paramValue['value'];
                         }
+
+                        foreach (array_keys(array_diff_key(array_flip($values), $result)) as $name) {
+                            $result[$name] = $this->getDefault($name);
+                        }
                     }
                 }
             }
@@ -92,16 +96,7 @@ class Param implements ParamInterface
 
         if (empty($result)) {
             foreach ($values as $v) {
-                $default = $cfgParams['defaults'][$v] ?? null;
-
-                if (!is_null($default) && is_string($default)) {
-                    $value = json_decode(sprintf('{"v": %s}', $default), true);
-                    if (json_last_error() != JSON_ERROR_NONE)
-                        $value = json_decode(sprintf('{"v": "%s"}', str_replace('"', '\"', $default)), true);
-                    $default = $value['v'];
-                }
-
-                $result[$v] = $default;
+                $result[$v] = $this->getDefault($v);
             }
         }
 
@@ -116,5 +111,24 @@ class Param implements ParamInterface
     public function findOneByName(string $name)
     {
         return $this->findByName([$name]);
+    }
+
+    /**
+     * @param string $name
+     * @return mixed|null
+     */
+    protected function getDefault(string $name)
+    {
+        $cfgParams = $this->parameterBag->get('experteam_api_base.params');
+        $default = $cfgParams['defaults'][$name] ?? null;
+
+        if (is_string($default)) {
+            $value = json_decode(sprintf('{"v": %s}', $default), true);
+            if (json_last_error() != JSON_ERROR_NONE)
+                $value = json_decode(sprintf('{"v": "%s"}', str_replace('"', '\"', $default)), true);
+            $default = $value['v'];
+        }
+
+        return $default;
     }
 }
