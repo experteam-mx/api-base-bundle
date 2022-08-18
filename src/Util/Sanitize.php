@@ -4,7 +4,7 @@ namespace Experteam\ApiBaseBundle\Util;
 
 class Sanitize
 {
-    const ALLOWS = [' ', '!', '@', '<', '>', '$', '#', '%', '&', '*', 'ñ', 'Ñ', '(', ')', '.', ','];
+    const ALLOWS = [' ', '!', '@', '<', '>', '$', '#', '%', '&', '*', 'ñ', 'Ñ', '(', ')', '.', ',', '-'];
 
     /**
      * @param string $value
