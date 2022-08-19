@@ -12,7 +12,7 @@ interface ParamInterface
 
     /**
      * @param string $name
-     * @return string
+     * @return array|string
      */
     public function findOneByName(string $name);
 

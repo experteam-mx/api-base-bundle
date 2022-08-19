@@ -105,7 +105,7 @@ class Param implements ParamInterface
 
     /**
      * @param string $name
-     * @return string
+     * @return array|string
      * @throws Exception
      */
     public function findOneByName(string $name)
