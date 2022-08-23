@@ -35,7 +35,7 @@
         <service id="Experteam\ApiBaseBundle\Service\RequestUtil\RequestUtilInterface" alias="api_base.request_util"/>
 
         <service id="api_base.elk_logger" class="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLogger" public="true">
-            <argument key="$logger" type="service" id="Psr\Log\LoggerInterface"/>
+            <argument key="$appLogger" type="service" id="Psr\Log\LoggerInterface"/>
             <argument key="$requestStack" type="service" id="Symfony\Component\HttpFoundation\RequestStack"/>
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>

@@ -13,7 +13,7 @@ class ELKLogger implements ELKLoggerInterface
     /**
      * @var LoggerInterface
      */
-    protected $logger;
+    protected $appLogger;
 
     /**
      * @var ParameterBagInterface
@@ -30,9 +30,9 @@ class ELKLogger implements ELKLoggerInterface
      */
     protected $requestStack;
 
-    public function __construct(LoggerInterface $logger, RequestStack $requestStack, TokenStorageInterface $tokenStorage, ParameterBagInterface $parameterBag)
+    public function __construct(LoggerInterface $appLogger, RequestStack $requestStack, TokenStorageInterface $tokenStorage, ParameterBagInterface $parameterBag)
     {
-        $this->logger = $logger;
+        $this->appLogger = $appLogger;
         $this->parameterBag = $parameterBag;
         $this->tokenStorage = $tokenStorage;
         $this->requestStack = $requestStack;
@@ -77,7 +77,7 @@ class ELKLogger implements ELKLoggerInterface
      */
     public function infoLog(string $message, array $data = []): void
     {
-        $this->logger->info($message, array_merge(
+        $this->appLogger->info($message, array_merge(
             $this->getContext(),
             ['timestamp' => date_create()],
             $data
@@ -90,7 +90,7 @@ class ELKLogger implements ELKLoggerInterface
      */
     public function debugLog(string $message, array $data = []): void
     {
-        $this->logger->debug($message, array_merge(
+        $this->appLogger->debug($message, array_merge(
             $this->getContext(),
             ['timestamp' => date_create()],
             $data
@@ -103,7 +103,7 @@ class ELKLogger implements ELKLoggerInterface
      */
     public function warningLog(string $message, array $data = []): void
     {
-        $this->logger->warning($message, array_merge(
+        $this->appLogger->warning($message, array_merge(
             $this->getContext(),
             ['timestamp' => date_create()],
             $data
@@ -116,7 +116,7 @@ class ELKLogger implements ELKLoggerInterface
      */
     public function errorLog(string $message, array $data = []): void
     {
-        $this->logger->error($message, array_merge(
+        $this->appLogger->error($message, array_merge(
             $this->getContext(),
             ['timestamp' => date_create()],
             $data
@@ -129,7 +129,7 @@ class ELKLogger implements ELKLoggerInterface
      */
     public function criticalLog(string $message, array $data = []): void
     {
-        $this->logger->critical($message, array_merge(
+        $this->appLogger->critical($message, array_merge(
             $this->getContext(),
             ['timestamp' => date_create()],
             $data
