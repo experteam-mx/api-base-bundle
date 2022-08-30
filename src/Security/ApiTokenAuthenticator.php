@@ -66,7 +66,7 @@ class ApiTokenAuthenticator extends AbstractGuardAuthenticator
         // skip beyond "Bearer "
         $credentials = substr($request->headers->get('Authorization'), 7);
 
-        if ($credentials === false) {
+        if (empty($credentials)) {
             $credentials = $request->headers->get('AppKey');
             $this->authType = Authenticate::AUTH_APP_KEY;
         }
