@@ -33,4 +33,10 @@ interface ELKLoggerInterface
      * @param array $data
      */
     public function criticalLog(string $message, array $data = []): void;
+
+    /**
+     * @param string $message
+     * @param array $data
+     */
+    public function noticeLog(string $message, array $data = []): void;
 }

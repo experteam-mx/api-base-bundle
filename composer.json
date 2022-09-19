@@ -45,5 +45,10 @@
         "symfony/flex": "^1.11",
         "symfony/framework-bundle": "5.2.*|5.3.*",
         "symfony/phpunit-bridge": "5.2.*|5.3.*"
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true
+        }
     }
 }
