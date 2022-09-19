@@ -17,3 +17,7 @@ phpunit.xml.dist
 /.env
 /.env.test
 /.env.local
+/docker-compose.yml
+/.cache/
+/.config/
+/.local/

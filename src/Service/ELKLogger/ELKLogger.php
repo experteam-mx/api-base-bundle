@@ -135,4 +135,21 @@ class ELKLogger implements ELKLoggerInterface
             $data
         ));
     }
+
+    /**
+     * @param string $message
+     * @param array $data
+     */
+    public function noticeLog(string $message, array $data = []): void
+    {
+        $this->appLogger
+            ->notice(
+                $message,
+                array_merge(
+                    $this->getContext(),
+                    ['timestamp' => date_create()],
+                    $data
+                )
+            );
+    }
 }
