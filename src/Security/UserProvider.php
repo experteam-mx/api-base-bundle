@@ -78,4 +78,24 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
         // 1. persist the new password in the user storage
         // 2. update the $user object with $user->setPassword($newEncodedPassword);
     }
+
+    /**
+     * The loadUserByIdentifier() method was introduced in Symfony 5.3.
+     * In previous versions it was called loadUserByUsername()
+     *
+     * Symfony calls this method if you use features like switch_user
+     * or remember_me. If you're not using these features, you do not
+     * need to implement this method.
+     *
+     * @param string $identifier
+     * @return UserInterface
+     * @throws Exception
+     */
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+        // Load a User object from your data source or throw UserNotFoundException.
+        // The $identifier argument is whatever value is being returned by the
+        // getUserIdentifier() method in your User class.
+        throw new Exception('TODO: fill in loadUserByIdentifier() inside ' . __FILE__);
+    }
 }
