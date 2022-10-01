@@ -186,7 +186,7 @@ class JSend implements JSendInterface
      */
     public function isResponseSupports(ResponseEvent $event): bool
     {
-        return $event->isMasterRequest()
+        return $event->isMainRequest()
             && $event->getRequest()->getPathInfo() !== self::PATH_INFO
             && $event->getResponse()->headers->get('content-type') === self::CONTENT_TYPE;
     }
