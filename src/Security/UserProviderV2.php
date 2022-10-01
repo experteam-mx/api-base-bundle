@@ -78,4 +78,25 @@ class UserProviderV2 implements UserProviderInterface, PasswordUpgraderInterface
         // 1. persist the new password in the user storage
         // 2. update the $user object with $user->setPassword($newHashedPassword);
     }
+
+    /**
+     * Symfony calls this method if you use features like switch_user
+     * or remember_me.
+     *
+     * If you're not using these features, you do not need to implement
+     * this method.
+     *
+     * @param string $username
+     * @return void
+     *
+     * @throws Exception
+     */
+    public function loadUserByUsername(string $username)
+    {
+        // Load a User object from your data source or throw UsernameNotFoundException.
+        // The $username argument may not actually be a username:
+        // it is whatever value is being returned by the getUsername()
+        // method in your User class.
+        throw new Exception('TODO: fill in loadUserByUsername() inside '.__FILE__);
+    }
 }
