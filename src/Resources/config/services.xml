@@ -93,7 +93,5 @@
             <argument key="$serializer" type="service" id="Symfony\Component\Serializer\SerializerInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\ChangeSet\ChangeSetInterface" alias="api_base.change_set"/>
-
-        <service id="api_base.user_provider_v2" class="Experteam\ApiBaseBundle\Security\UserProviderV2"/>
     </services>
 </container>

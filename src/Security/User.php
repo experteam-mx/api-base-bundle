@@ -137,17 +137,19 @@ class User implements UserInterface
     /**
      * @see UserInterface
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         // not needed for apps that do not check user passwords
+        return null;
     }
 
     /**
      * @see UserInterface
      */
-    public function getSalt()
+    public function getSalt(): ?string
     {
         // not needed for apps that do not check user passwords
+        return null;
     }
 
     /**
@@ -264,5 +266,15 @@ class User implements UserInterface
         $this->appkey = $appkey;
 
         return $this;
+    }
+
+    /**
+     * The public representation of the user (e.g. a username, an email address, etc.)
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): ?string
+    {
+        return ($this->token ?? ($this->appkey ?? null));
     }
 }

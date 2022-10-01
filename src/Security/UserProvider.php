@@ -4,6 +4,7 @@ namespace Experteam\ApiBaseBundle\Security;
 
 use Exception;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -11,24 +12,23 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
     /**
+     * The loadUserByIdentifier() method was introduced in Symfony 5.3.
+     * In previous versions it was called loadUserByUsername()
+     *
      * Symfony calls this method if you use features like switch_user
-     * or remember_me.
+     * or remember_me. If you're not using these features, you do not
+     * need to implement this method.
      *
-     * If you're not using these features, you do not need to implement
-     * this method.
-     *
-     * @param $username
-     * @return void
-     *
+     * @param string $identifier
+     * @return UserInterface
      * @throws Exception
      */
-    public function loadUserByUsername($username)
+    public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        // Load a User object from your data source or throw UsernameNotFoundException.
-        // The $username argument may not actually be a username:
-        // it is whatever value is being returned by the getUsername()
-        // method in your User class.
-        throw new Exception('TODO: fill in loadUserByUsername() inside ' . __FILE__);
+        // Load a User object from your data source or throw UserNotFoundException.
+        // The $identifier argument is whatever value is being returned by the
+        // getUserIdentifier() method in your User class.
+        throw new Exception('TODO: fill in loadUserByIdentifier() inside ' . __FILE__);
     }
 
     /**
@@ -53,49 +53,50 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
         }
 
         // Return a User object after making sure its data is "fresh".
-        // Or throw a UsernameNotFoundException if the user no longer exists.
+        // Or throw a UserNotFoundException if the user no longer exists.
         throw new Exception('TODO: fill in refreshUser() inside ' . __FILE__);
     }
 
     /**
      * Tells Symfony to use this provider for this User class.
-     * @param $class
+     * @param string $class
      * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass(string $class)
     {
-        return User::class === $class;
+        return User::class === $class || is_subclass_of($class, User::class);
     }
 
     /**
-     * Upgrades the encoded password of a user, typically for using a better hash algorithm.
-     * @param UserInterface $user
-     * @param string $newEncodedPassword
+     * Upgrades the hashed password of a user, typically for using a better hash algorithm.
+     * @param PasswordAuthenticatedUserInterface $user
+     * @param string $newHashedPassword
      */
-    public function upgradePassword(UserInterface $user, string $newEncodedPassword): void
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
-        // TODO: when encoded passwords are in use, this method should:
+        // TODO: when hashed passwords are in use, this method should:
         // 1. persist the new password in the user storage
-        // 2. update the $user object with $user->setPassword($newEncodedPassword);
+        // 2. update the $user object with $user->setPassword($newHashedPassword);
     }
 
     /**
-     * The loadUserByIdentifier() method was introduced in Symfony 5.3.
-     * In previous versions it was called loadUserByUsername()
-     *
      * Symfony calls this method if you use features like switch_user
-     * or remember_me. If you're not using these features, you do not
-     * need to implement this method.
+     * or remember_me.
      *
-     * @param string $identifier
-     * @return UserInterface
+     * If you're not using these features, you do not need to implement
+     * this method.
+     *
+     * @param string $username
+     * @return void
+     *
      * @throws Exception
      */
-    public function loadUserByIdentifier(string $identifier): UserInterface
+    public function loadUserByUsername(string $username)
     {
-        // Load a User object from your data source or throw UserNotFoundException.
-        // The $identifier argument is whatever value is being returned by the
-        // getUserIdentifier() method in your User class.
-        throw new Exception('TODO: fill in loadUserByIdentifier() inside ' . __FILE__);
+        // Load a User object from your data source or throw UsernameNotFoundException.
+        // The $username argument may not actually be a username:
+        // it is whatever value is being returned by the getUsername()
+        // method in your User class.
+        throw new Exception('TODO: fill in loadUserByUsername() inside '.__FILE__);
     }
 }
