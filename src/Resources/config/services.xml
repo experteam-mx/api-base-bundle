@@ -11,7 +11,7 @@
 
         <service id="api_base.user_provider" class="Experteam\ApiBaseBundle\Security\UserProvider"/>
 
-        <service id="Predis\Client" alias="snc_redis.default"/>
+        <service id="Redis" alias="snc_redis.default"/>
 
         <service id="api_base.jsend" class="Experteam\ApiBaseBundle\Service\JSend\JSend" public="true">
             <argument key="$elkLogger" type="service" id="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface"/>
@@ -53,13 +53,13 @@
             <argument key="$httpClient" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
-            <argument key="$predisClient" type="service" id="Predis\Client"/>
+            <argument key="$redis" type="service" id="Redis"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\Authenticate\AuthenticateInterface" alias="api_base.authenticate"/>
 
         <service id="api_base.entity_config" class="Experteam\ApiBaseBundle\Service\EntityConfig\EntityConfig" public="true">
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
-            <argument key="$predisClient" type="service" id="Predis\Client"/>
+            <argument key="$redis" type="service" id="Redis"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\EntityConfig\EntityConfigInterface" alias="api_base.entity_config"/>
 
@@ -81,7 +81,7 @@
         </service>
 
         <service id="api_base.transaction" class="Experteam\ApiBaseBundle\Service\Transaction\Transaction" public="true">
-            <argument key="$predisClient" type="service" id="Predis\Client"/>
+            <argument key="$redis" type="service" id="Redis"/>
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
             <argument key="$requestStack" type="service" id="Symfony\Component\HttpFoundation\RequestStack"/>
             <argument key="$serializer" type="service" id="Symfony\Component\Serializer\SerializerInterface"/>

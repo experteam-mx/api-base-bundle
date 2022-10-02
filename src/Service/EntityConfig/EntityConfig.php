@@ -3,7 +3,7 @@
 namespace Experteam\ApiBaseBundle\Service\EntityConfig;
 
 use Experteam\ApiBaseBundle\Security\User;
-use Predis\Client;
+use Redis;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
@@ -21,7 +21,7 @@ class EntityConfig implements EntityConfigInterface
         'COMPANY_COUNTRY' => 'CompanyCountry',
         'LOCATION' => 'Location',
         'LOCATION_EMPLOYEE' => 'LocationEmployee',
-        'INSTALLATION' => 'Installation',
+        'INSTALLATION' => 'Installation'
     ];
 
     /**
@@ -30,18 +30,18 @@ class EntityConfig implements EntityConfigInterface
     protected $tokenStorage;
 
     /**
-     * @var Client
+     * @var Redis
      */
-    private $predisClient;
+    private $redis;
 
     /**
      * @param TokenStorageInterface $tokenStorage
-     * @param Client $predisClient
+     * @param Redis $redis
      */
-    public function __construct(TokenStorageInterface $tokenStorage, Client $predisClient)
+    public function __construct(TokenStorageInterface $tokenStorage, Redis $redis)
     {
         $this->tokenStorage = $tokenStorage;
-        $this->predisClient = $predisClient;
+        $this->redis = $redis;
     }
 
     /**
@@ -52,7 +52,6 @@ class EntityConfig implements EntityConfigInterface
     public function isActive(string $entity, int $id): bool
     {
         $actives = $this->getActives($entity);
-
         return in_array($id, $actives);
     }
 
@@ -65,40 +64,47 @@ class EntityConfig implements EntityConfigInterface
         /** @var User $user */
         $user = $this->tokenStorage->getToken()->getUser();
         $session = $user->getSession();
-        if (is_null($session))
+
+        if (is_null($session)) {
             throw new BadRequestHttpException(sprintf('You do not have an active session for get %s actives', $entity));
+        }
 
         $prefix = "companies.{$entity}Entity:";
 
         $fromRedis = [
             [$prefix . self::MODEL_TYPES['GLOBAL'], 0],
-            [$prefix . self::MODEL_TYPES['COUNTRY'], $session['country_id'] ?? null],
-            [$prefix . self::MODEL_TYPES['COMPANY_COUNTRY'], $session['company_country_id'] ?? null],
-            [$prefix . self::MODEL_TYPES['LOCATION'], $session['location_id'] ?? null],
-            [$prefix . self::MODEL_TYPES['LOCATION_EMPLOYEE'], $session['location_employee_id'] ?? null],
-            [$prefix . self::MODEL_TYPES['INSTALLATION'], $session['installation_id'] ?? null],
+            [$prefix . self::MODEL_TYPES['COUNTRY'], ($session['country_id'] ?? null)],
+            [$prefix . self::MODEL_TYPES['COMPANY_COUNTRY'], ($session['company_country_id'] ?? null)],
+            [$prefix . self::MODEL_TYPES['LOCATION'], ($session['location_id'] ?? null)],
+            [$prefix . self::MODEL_TYPES['LOCATION_EMPLOYEE'], ($session['location_employee_id'] ?? null)],
+            [$prefix . self::MODEL_TYPES['INSTALLATION'], ($session['installation_id'] ?? null)]
         ];
 
         $actives = [];
         $inactives = [];
 
         foreach ($fromRedis as [$key, $id]) {
-            $levelConfigured = $this->predisClient->hget($key, $id);
+            $levelConfigured = $this->redis->hGet($key, (string)$id);
 
-            if (is_null($levelConfigured))
+            if (is_null($levelConfigured)) {
                 continue;
+            }
 
             $levelConfigured = json_decode($levelConfigured, true);
 
-            $levelActives = array_keys(array_filter($levelConfigured, function($v) { return $v; }));
-            $actives = empty($actives) ? $levelActives : array_intersect($actives, $levelActives);
+            $levelActives = array_keys(array_filter($levelConfigured, function ($v) {
+                return $v;
+            }));
 
-            $levelInactives = array_keys(array_filter($levelConfigured, function($v) { return !$v; }));
-            $inactives = empty($inactives) ? $levelInactives : array_intersect($inactives, $levelInactives);
+            $actives = (empty($actives) ? $levelActives : array_intersect($actives, $levelActives));
+
+            $levelInactives = array_keys(array_filter($levelConfigured, function ($v) {
+                return !$v;
+            }));
+
+            $inactives = (empty($inactives) ? $levelInactives : array_intersect($inactives, $levelInactives));
         }
 
         return array_diff($actives, $inactives);
     }
-
-
 }

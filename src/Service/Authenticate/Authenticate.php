@@ -3,7 +3,7 @@
 namespace Experteam\ApiBaseBundle\Service\Authenticate;
 
 use Experteam\ApiBaseBundle\Security\User;
-use Predis\Client;
+use Redis;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
@@ -31,16 +31,16 @@ class Authenticate implements AuthenticateInterface
     private $tokenStorage;
 
     /**
-     * @var Client
+     * @var Redis
      */
-    private $predisClient;
+    private $redis;
 
-    public function __construct(HttpClientInterface $httpClient, ParameterBagInterface $parameterBag, TokenStorageInterface $tokenStorage, Client $predisClient)
+    public function __construct(HttpClientInterface $httpClient, ParameterBagInterface $parameterBag, TokenStorageInterface $tokenStorage, Redis $redis)
     {
         $this->httpClient = $httpClient;
         $this->parameterBag = $parameterBag;
         $this->tokenStorage = $tokenStorage;
-        $this->predisClient = $predisClient;
+        $this->redis = $redis;
     }
 
     /**
@@ -138,7 +138,7 @@ class Authenticate implements AuthenticateInterface
     public function getRedisUser(string $credentials, int $authType = self::AUTH_TOKEN): ?User
     {
         $user = null;
-        $data = json_decode($this->predisClient->get($this->getRedisKey($credentials, $authType)), true);
+        $data = json_decode($this->redis->get($this->getRedisKey($credentials, $authType)), true);
 
         if (!is_null($data)) {
             $data = $this->formatUserData($credentials, $data, $authType);
