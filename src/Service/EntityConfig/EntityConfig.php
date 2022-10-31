@@ -86,7 +86,7 @@ class EntityConfig implements EntityConfigInterface
         foreach ($fromRedis as [$key, $id]) {
             $levelConfigured = $this->redis->hGet($key, (string)$id);
 
-            if (is_null($levelConfigured)) {
+            if ($levelConfigured === false) {
                 continue;
             }
 
