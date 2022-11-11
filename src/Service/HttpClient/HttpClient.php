@@ -2,6 +2,8 @@
 
 namespace Experteam\ApiBaseBundle\Service\HttpClient;
 
+use Experteam\ApiBaseBundle\Service\TraceLogger\TraceLogger;
+use Experteam\ApiBaseBundle\Service\TraceLogger\TraceLoggerInterface;
 use Closure;
 use Experteam\ApiBaseBundle\Security\User;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -39,15 +41,28 @@ class HttpClient implements HttpClientInterface
     private $validator;
 
     /**
+     * @var TraceLoggerInterface
+     */
+    private $traceLogger;
+
+    /**
+     * @var string|null
+     */
+    private $traceMessage;
+
+    /**
      * @param BaseHttpClientInterface $httpClient
      * @param TokenStorageInterface $tokenStorage
      * @param ValidatorInterface $validator
+     * @param TraceLoggerInterface $traceLogger
      */
-    public function __construct(BaseHttpClientInterface $httpClient, TokenStorageInterface $tokenStorage, ValidatorInterface $validator)
+    public function __construct(BaseHttpClientInterface $httpClient, TokenStorageInterface $tokenStorage,
+                                ValidatorInterface $validator, TraceLoggerInterface $traceLogger)
     {
         $this->client = $httpClient;
         $this->tokenStorage = $tokenStorage;
         $this->validator = $validator;
+        $this->traceLogger = $traceLogger;
     }
 
     /**
@@ -56,12 +71,13 @@ class HttpClient implements HttpClientInterface
      * @param Closure|null $dataValidator
      * @param array $query
      * @param string|null $appKey
+     * @param array $headers
      * @return array [status, message, response]
      * @throws HttpException
      */
-    public function post(string $url, $body, Closure $dataValidator = null, array $query = [], string $appKey = null): array
+    public function post(string $url, $body, Closure $dataValidator = null, array $query = [], string $appKey = null, array $headers = []): array
     {
-        return $this->request('POST', $url, ['body' => $body, 'query' => $query], $appKey, $dataValidator);
+        return $this->request('POST', $url, ['body' => $body, 'query' => $query, 'headers' => $headers], $appKey, $dataValidator);
     }
 
     /**
@@ -70,12 +86,13 @@ class HttpClient implements HttpClientInterface
      * @param Closure|null $dataValidator
      * @param array $query
      * @param string|null $appKey
+     * @param array $headers
      * @return array [status, message, response]
      * @throws HttpException
      */
-    public function put(string $url, $body, Closure $dataValidator = null, array $query = [], string $appKey = null): array
+    public function put(string $url, $body, Closure $dataValidator = null, array $query = [], string $appKey = null, array $headers = []): array
     {
-        return $this->request('PUT', $url, ['body' => $body, 'query' => $query], $appKey, $dataValidator);
+        return $this->request('PUT', $url, ['body' => $body, 'query' => $query, 'headers' => $headers], $appKey, $dataValidator);
     }
 
     /**
@@ -83,12 +100,13 @@ class HttpClient implements HttpClientInterface
      * @param array $query
      * @param Closure|null $dataValidator
      * @param string|null $appKey
+     * @param array $headers
      * @return array [status, message, response]
      * @throws HttpException
      */
-    public function get(string $url, array $query = [], Closure $dataValidator = null, string $appKey = null): array
+    public function get(string $url, array $query = [], Closure $dataValidator = null, string $appKey = null, array $headers = []): array
     {
-        return $this->request('GET', $url, ['query' => $query], $appKey, $dataValidator);
+        return $this->request('GET', $url, ['query' => $query, 'headers' => $headers], $appKey, $dataValidator);
     }
 
     /**
@@ -112,9 +130,17 @@ class HttpClient implements HttpClientInterface
             $options['headers'] = array_merge($options['headers'] ?? [], ['AppKey' => $appKey]);
 
         try {
+            if ($this->traceLogger->getOptions()[TraceLogger::TRACE_REQUESTS])
+                $this->traceLogger->addTrace(($this->traceMessage ?? '') . 'Request Begin', $url);
+
             $response = $this->client
                 ->request($method, $url, $options)
                 ->toArray(false);
+
+            if ($this->traceLogger->getOptions()[TraceLogger::TRACE_REQUESTS])
+                $this->traceLogger->addTrace(($this->traceMessage ?? '') . 'Request Finish', true);
+
+            $this->traceMessage = null;
 
         } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
             throw new HttpException(500, $e->getMessage());
