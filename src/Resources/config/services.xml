@@ -98,7 +98,6 @@
             <argument key="$requestStack" type="service" id="Symfony\Component\HttpFoundation\RequestStack"/>
             <argument key="$elkLogger" type="service" id="Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface"/>
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
-            <argument key="$predisClient" type="service" id="Predis\Client"/>
             <argument key="$manager" type="service" id="Doctrine\ORM\EntityManagerInterface"/>
             <argument key="$serializer" type="service" id="Symfony\Component\Serializer\SerializerInterface"/>
             <argument key="$logger" type="service" id="Psr\Log\LoggerInterface"/>
