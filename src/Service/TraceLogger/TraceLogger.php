@@ -7,7 +7,6 @@ use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\ORM\EntityManagerInterface;
 use Experteam\ApiBaseBundle\Security\User;
 use Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface;
-use Predis\Client;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,11 +40,6 @@ class TraceLogger implements TraceLoggerInterface
      * @var TokenStorageInterface
      */
     private $tokenStorage;
-
-    /**
-     * @var Client
-     */
-    private $predisClient;
 
     /**
      * @var DebugStack
@@ -93,14 +87,13 @@ class TraceLogger implements TraceLoggerInterface
     ];
 
     public function __construct(RequestStack $requestStack, ELKLoggerInterface $elkLogger, TokenStorageInterface $tokenStorage,
-                                Client $predisClient, EntityManagerInterface $manager, SerializerInterface $serializer,
+                                EntityManagerInterface $manager, SerializerInterface $serializer,
                                 LoggerInterface $logger)
     {
         $this->logger = $logger;
         $this->requestStack = $requestStack;
         $this->elkLogger = $elkLogger;
         $this->tokenStorage = $tokenStorage;
-        $this->predisClient = $predisClient;
         $this->manager = $manager;
         $this->serializer = $serializer;
         $this->doctrinelogger = new DebugStack();
@@ -137,10 +130,7 @@ class TraceLogger implements TraceLoggerInterface
             $session = $user->getSession();
             if (!is_null($session)) {
                 $this->auth['session'] = $session;
-
-                $location = json_decode($this->predisClient->hget('companies.location', $session['location_id'] ?? 0));
-                if (!is_null($location))
-                    $this->gmtOffset = $location->gmt_offset ?? '+00:00';
+                $this->gmtOffset = $session['gmt_offset'] ?? '+00:00';
             }
         }
 
