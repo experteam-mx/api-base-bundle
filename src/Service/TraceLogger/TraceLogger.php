@@ -86,6 +86,11 @@ class TraceLogger implements TraceLoggerInterface
         self::TRACE_REQUESTS => false
     ];
 
+    /**
+     * @var bool
+     */
+    private $initialized = false;
+
     public function __construct(RequestStack $requestStack, ELKLoggerInterface $elkLogger, TokenStorageInterface $tokenStorage,
                                 EntityManagerInterface $manager, SerializerInterface $serializer,
                                 LoggerInterface $logger)
@@ -105,6 +110,8 @@ class TraceLogger implements TraceLoggerInterface
      */
     public function init(array $options = []): TraceLogger
     {
+        $this->initialized = true;
+
         foreach ($options as $key => $value)
             if (isset($this->options[$key]))
                 $this->options[$key] = $value;
@@ -235,6 +242,9 @@ class TraceLogger implements TraceLoggerInterface
      */
     public function response(Response $response): TraceLogger
     {
+        if (!$this->initialized)
+            return $this;
+
         $statusCode = $response->getStatusCode();
 
         if ($statusCode != 200 || $this->options[self::TRACE_SUCCESS_RESPONSE])
