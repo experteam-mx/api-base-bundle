@@ -74,6 +74,11 @@ class DelayAlert implements DelayAlertInterface
     private $url;
 
     /**
+     * @var string
+     */
+    private $application;
+
+    /**
      * @var array
      */
     private $destination;
@@ -95,6 +100,7 @@ class DelayAlert implements DelayAlertInterface
 
         $config = $parameterBag->get('experteam_api_base.delay_alert');
         $this->url = $config['remote_url'];
+        $this->application = $config['application'];
 
         $name = $config['destination_name'];
         $address = $config['destination_address'];
@@ -191,7 +197,7 @@ class DelayAlert implements DelayAlertInterface
         $attachRequestInfo = $this->options[self::REQUEST_INFO];
 
         $emailBody = $this->getEmailBody(
-            $this->parameterBag->get('app.prefix'),
+            $this->application,
             $request->getUri(),
             $seconds,
             $statusCode,
@@ -200,7 +206,7 @@ class DelayAlert implements DelayAlertInterface
 
         $emailRequest = [
             'destinations' => [$this->destination],
-            'subject' => 'Reporte de Demora en API Inventories',
+            'subject' => 'Reporte de Demora en ' . $this->application,
             'body' => $emailBody,
             'attachments' => []
         ];

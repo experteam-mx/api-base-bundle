@@ -65,6 +65,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('delay_alert')
                     ->addDefaultsIfNotSet()
                     ->children()
+                        ->scalarNode('application')->defaultValue('')->end()
                         ->scalarNode('remote_url')->defaultValue(null)->end()
                         ->arrayNode('routes')
                             ->arrayPrototype()
