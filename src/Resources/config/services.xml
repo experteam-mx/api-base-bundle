@@ -67,9 +67,15 @@
             <argument key="$httpClient" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
             <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
             <argument key="$validator" type="service" id="Symfony\Component\Validator\Validator\ValidatorInterface"/>
-            <argument key="$traceLogger" type="service" id="Experteam\ApiBaseBundle\Service\TraceLogger\TraceLoggerInterface"/>
+            <argument key="$httpEvents" type="service" id="Experteam\ApiBaseBundle\Service\HttpClient\HttpEventsInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\HttpClient\HttpClientInterface" alias="api_base.http_client"/>
+
+        <service id="api_base.http_events" class="Experteam\ApiBaseBundle\Service\HttpClient\HttpEvents" public="false">
+            <argument key="$traceLogger" type="service" id="Experteam\ApiBaseBundle\Service\TraceLogger\TraceLoggerInterface"/>
+            <argument key="$delayAlert" type="service" id="Experteam\ApiBaseBundle\Service\DelayAlert\DelayAlertInterface"/>
+        </service>
+        <service id="Experteam\ApiBaseBundle\Service\HttpClient\HttpEventsInterface" alias="api_base.http_events"/>
 
         <service id="api_base.fixtures_load_command" class="Experteam\ApiBaseBundle\Command\LoadFixturesCommand">
             <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
@@ -104,5 +110,14 @@
             <argument key="$logger" type="service" id="Psr\Log\LoggerInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\TraceLogger\TraceLoggerInterface" alias="api_base.trace_logger"/>
+
+        <service id="api_base.delay_alert" class="Experteam\ApiBaseBundle\Service\DelayAlert\DelayAlert" public="true">
+            <argument key="$tokenStorage" type="service" id="Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface"/>
+            <argument key="$parameterBag" type="service" id="Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface"/>
+            <argument key="$traceLogger" type="service" id="Experteam\ApiBaseBundle\Service\TraceLogger\TraceLoggerInterface"/>
+            <argument key="$logger" type="service" id="Psr\Log\LoggerInterface"/>
+            <argument key="$httpClient" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
+        </service>
+        <service id="Experteam\ApiBaseBundle\Service\DelayAlert\DelayAlertInterface" alias="api_base.delay_alert"/>
     </services>
 </container>

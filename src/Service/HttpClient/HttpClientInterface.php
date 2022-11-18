@@ -8,6 +8,12 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 interface HttpClientInterface
 {
     /**
+     * @param string $traceMessage
+     * @return HttpClient
+     */
+    public function setTraceMessage(string $traceMessage): HttpClient;
+
+    /**
      * @param string $url
      * @param mixed $body
      * @param Closure|null $dataValidator

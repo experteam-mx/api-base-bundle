@@ -2,8 +2,6 @@
 
 namespace Experteam\ApiBaseBundle\Service\HttpClient;
 
-use Experteam\ApiBaseBundle\Service\TraceLogger\TraceLogger;
-use Experteam\ApiBaseBundle\Service\TraceLogger\TraceLoggerInterface;
 use Closure;
 use Experteam\ApiBaseBundle\Security\User;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -41,9 +39,9 @@ class HttpClient implements HttpClientInterface
     private $validator;
 
     /**
-     * @var TraceLoggerInterface
+     * @var HttpEventsInterface
      */
-    private $traceLogger;
+    private $httpEvents;
 
     /**
      * @var string|null
@@ -54,15 +52,26 @@ class HttpClient implements HttpClientInterface
      * @param BaseHttpClientInterface $httpClient
      * @param TokenStorageInterface $tokenStorage
      * @param ValidatorInterface $validator
-     * @param TraceLoggerInterface $traceLogger
+     * @param HttpEventsInterface $httpEvents
      */
     public function __construct(BaseHttpClientInterface $httpClient, TokenStorageInterface $tokenStorage,
-                                ValidatorInterface $validator, TraceLoggerInterface $traceLogger)
+                                ValidatorInterface $validator, HttpEventsInterface $httpEvents)
     {
         $this->client = $httpClient;
         $this->tokenStorage = $tokenStorage;
         $this->validator = $validator;
-        $this->traceLogger = $traceLogger;
+        $this->httpEvents = $httpEvents;
+    }
+
+    /**
+     * @param string $traceMessage
+     * @return HttpClient
+     */
+    public function setTraceMessage(string $traceMessage): HttpClient
+    {
+        $this->traceMessage = $traceMessage;
+
+        return $this;
     }
 
     /**
@@ -130,15 +139,12 @@ class HttpClient implements HttpClientInterface
             $options['headers'] = array_merge($options['headers'] ?? [], ['AppKey' => $appKey]);
 
         try {
-            if ($this->traceLogger->getOptions()[TraceLogger::TRACE_REQUESTS])
-                $this->traceLogger->addTrace(($this->traceMessage ?? '') . 'Request Begin', $url);
+            $this->httpEvents->beforeRequest($this->traceMessage, $url);
 
-            $response = $this->client
-                ->request($method, $url, $options)
-                ->toArray(false);
+            $_response = $this->client->request($method, $url, $options);
+            $response = $_response->toArray(false);
 
-            if ($this->traceLogger->getOptions()[TraceLogger::TRACE_REQUESTS])
-                $this->traceLogger->addTrace(($this->traceMessage ?? '') . 'Request Finish', true);
+            $this->httpEvents->afterRequest($this->traceMessage, $_response);
 
             $this->traceMessage = null;
 
