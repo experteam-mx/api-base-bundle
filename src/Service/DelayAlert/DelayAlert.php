@@ -295,7 +295,7 @@ class DelayAlert implements DelayAlertInterface
                 </head>
             <body>
                 <p>Estimad@(s):</p>
-                <p>Este correo es debido a que se detectó una demora excesiva en {{ app }}.</p>
+                <p>Este correo es debido a que se detectó una demora excesiva en $app.</p>
         
                 <p>URL: $url</p>
                 <p>Tiempo de respuesta: $seconds segundos</p>
