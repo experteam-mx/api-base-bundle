@@ -202,13 +202,11 @@ class TraceLogger implements TraceLoggerInterface
 
     /**
      * @param string $message
-     * @param bool $trace
-     * @param bool $queries
      * @return TraceLogger
      */
-    public function info(string $message, bool $trace = true, bool $queries = false): TraceLogger
+    public function info(string $message): TraceLogger
     {
-        $data = $this->prepareData($trace, $queries);
+        $data = $this->prepareData();
 
         $this->logger->info($message, $data);
 
@@ -220,13 +218,11 @@ class TraceLogger implements TraceLoggerInterface
 
     /**
      * @param string $message
-     * @param bool $trace
-     * @param bool $queries
      * @return TraceLogger
      */
-    public function error(string $message, bool $trace = true, bool $queries = false): TraceLogger
+    public function error(string $message): TraceLogger
     {
-        $data = $this->prepareData($trace, $queries);
+        $data = $this->prepareData();
 
         $this->logger->error($message, $data);
 
@@ -251,8 +247,8 @@ class TraceLogger implements TraceLoggerInterface
             $this->addTrace('Response Content', $response->getContent());
 
         return $statusCode == 200
-            ? $this->info($statusCode, true, true) :
-            $this->error($statusCode, true, true);
+            ? $this->info($statusCode) :
+            $this->error($statusCode);
     }
 
     /**
@@ -264,20 +260,25 @@ class TraceLogger implements TraceLoggerInterface
     }
 
     /**
-     * @param bool $trace
-     * @param bool $queries
      * @return array
      */
-    protected function prepareData(bool $trace = true, bool $queries = false): array
+    public function prepareData(): array
     {
-        return array_merge([
+        return [
             'request' => $this->request,
             'auth' => $this->auth,
-            'gmtOffset' => $this->gmtOffset
-        ],
-            $trace ? ['trace' => $this->trace] : [],
-            $queries ? ['queries' => $this->doctrinelogger->queries] : []
-        );
+            'gmtOffset' => $this->gmtOffset,
+            'trace' => $this->trace,
+            'queries' => $this->doctrinelogger->queries
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInitialized(): bool
+    {
+        return $this->initialized;
     }
 
     /**

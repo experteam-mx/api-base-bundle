@@ -43,19 +43,15 @@ interface TraceLoggerInterface
 
     /**
      * @param string $message
-     * @param bool $trace
-     * @param bool $queries
      * @return TraceLogger
      */
-    public function info(string $message, bool $trace = true, bool $queries = false): TraceLogger;
+    public function info(string $message): TraceLogger;
 
     /**
      * @param string $message
-     * @param bool $trace
-     * @param bool $queries
      * @return TraceLogger
      */
-    public function error(string $message, bool $trace = true, bool $queries = false): TraceLogger;
+    public function error(string $message): TraceLogger;
 
     /**
      * @param Response $response
@@ -67,5 +63,15 @@ interface TraceLoggerInterface
      * @return array
      */
     public function getOptions(): array;
+
+    /**
+     * @return array
+     */
+    public function prepareData(): array;
+
+    /**
+     * @return bool
+     */
+    public function isInitialized(): bool;
 
 }
