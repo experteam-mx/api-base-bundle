@@ -23,6 +23,7 @@ class ExperteamApiBaseExtension extends Extension
         $container->setParameter('experteam_api_base.appkey', $config['appkey']);
         $container->setParameter('experteam_api_base.etag', $config['etag']);
         $container->setParameter('experteam_api_base.auth', $config['auth']);
+        $container->setParameter('experteam_api_base.delay_alert', $config['delay_alert']);
     }
 
 }
