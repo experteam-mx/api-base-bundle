@@ -259,4 +259,14 @@ class Common
         $result['content'] = $content;
         return $result;
     }
+
+    /**
+     * @param mixed $data
+     * @return string
+     */
+    public static function jsonEncode($data): string
+    {
+        $jsonEncoder = new JsonEncoder();
+        return $jsonEncoder->encode($data, 'json');
+    }
 }
