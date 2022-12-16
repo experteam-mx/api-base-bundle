@@ -52,7 +52,7 @@ class Localization implements LocalizationInterface
      * @return string
      * @throws Exception
      */
-    public function getDefaultTimezone()
+    public function getDefaultTimezone(): string
     {
         if (is_null($this->defaultTimezone)) {
             $timezoneConfig = $this->parameterBag->get('experteam_api_base.timezone');
@@ -115,7 +115,7 @@ class Localization implements LocalizationInterface
      */
     public function processLocalUpdatedAt(object $object)
     {
-        if (in_array(LocalUpdatedAtEntity::class, class_uses($object)) && is_null($object->getLocalUpdatedAt()))
+        if (in_array(LocalUpdatedAtEntity::class, class_uses($object)) && !$object->localUpdatedAtAssigned)
             $object->setLocalUpdatedAt(date_create('now', new DateTimeZone($this->getDefaultTimezone())));
     }
 }

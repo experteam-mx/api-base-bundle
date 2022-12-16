@@ -7,7 +7,7 @@ interface LocalizationInterface
     /**
      * @return string
      */
-    public function getDefaultTimezone();
+    public function getDefaultTimezone(): string;
 
     /**
      * @param object $object

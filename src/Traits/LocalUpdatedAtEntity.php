@@ -13,6 +13,8 @@ trait LocalUpdatedAtEntity
      */
     protected $localUpdatedAt;
 
+    public $localUpdatedAtAssigned = false;
+
     public function getLocalUpdatedAt(): ?DateTime
     {
         return $this->localUpdatedAt;
