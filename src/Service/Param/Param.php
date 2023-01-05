@@ -17,6 +17,13 @@ use Symfony\Component\Validator\Validation;
 
 class Param implements ParamInterface
 {
+    const GLOBAL = 'GLOBAL';
+    const COUNTRY = 'Country';
+    const COMPANY_COUNTRY = 'CompanyCountry';
+    const LOCATION = 'Location';
+    const INSTALLATION = 'Installation';
+    const EMPLOYEE = 'Employee';
+
     /**
      * @var HttpClientInterface
      */
@@ -48,10 +55,12 @@ class Param implements ParamInterface
 
     /**
      * @param array $values
+     * @param string|null $modelType
+     * @param string|null $modelId
      * @return array|string
      * @throws Exception
      */
-    public function findByName(array $values)
+    public function findByName(array $values, string $modelType = null, string $modelId = null)
     {
         $result = [];
         $cfgParams = $this->parameterBag->get('experteam_api_base.params');
@@ -72,8 +81,14 @@ class Param implements ParamInterface
 
                         $response = $this->client->request('POST', $url, array_merge([
                             'body' => [
-                                'parameters' => array_map(function ($v) {
-                                    return ['name' => $v];
+                                'parameters' => array_map(function ($v) use ($modelType, $modelId) {
+                                    return array_merge(
+                                        ['name' => $v],
+                                        !is_null($modelType) && !is_null($modelId) ? [
+                                            'model_type' => $modelType,
+                                            'model_id' => $modelId
+                                        ] : []
+                                    );
                                 }, $values)
                             ]
                         ], $authentication))->toArray(false);
@@ -105,12 +120,14 @@ class Param implements ParamInterface
 
     /**
      * @param string $name
+     * @param string|null $modelType
+     * @param string|null $modelId
      * @return array|string
      * @throws Exception
      */
-    public function findOneByName(string $name)
+    public function findOneByName(string $name, string $modelType = null, string $modelId = null)
     {
-        return $this->findByName([$name]);
+        return $this->findByName([$name], $modelType, $modelId);
     }
 
     /**
