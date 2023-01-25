@@ -81,12 +81,13 @@ class HttpClient implements HttpClientInterface
      * @param array $query
      * @param string|null $appKey
      * @param array $headers
+     * @param bool $ignoreResponse
      * @return array [status, message, response]
      * @throws HttpException
      */
-    public function post(string $url, $body, Closure $dataValidator = null, array $query = [], string $appKey = null, array $headers = []): array
+    public function post(string $url, $body, Closure $dataValidator = null, array $query = [], string $appKey = null, array $headers = [], bool $ignoreResponse = false): array
     {
-        return $this->request('POST', $url, ['body' => $body, 'query' => $query, 'headers' => $headers], $appKey, $dataValidator);
+        return $this->request('POST', $url, ['body' => $body, 'query' => $query, 'headers' => $headers], $appKey, $dataValidator, $ignoreResponse);
     }
 
     /**
@@ -96,12 +97,13 @@ class HttpClient implements HttpClientInterface
      * @param array $query
      * @param string|null $appKey
      * @param array $headers
+     * @param bool $ignoreResponse
      * @return array [status, message, response]
      * @throws HttpException
      */
-    public function put(string $url, $body, Closure $dataValidator = null, array $query = [], string $appKey = null, array $headers = []): array
+    public function put(string $url, $body, Closure $dataValidator = null, array $query = [], string $appKey = null, array $headers = [], bool $ignoreResponse = false): array
     {
-        return $this->request('PUT', $url, ['body' => $body, 'query' => $query, 'headers' => $headers], $appKey, $dataValidator);
+        return $this->request('PUT', $url, ['body' => $body, 'query' => $query, 'headers' => $headers], $appKey, $dataValidator, $ignoreResponse);
     }
 
     /**
@@ -110,12 +112,13 @@ class HttpClient implements HttpClientInterface
      * @param Closure|null $dataValidator
      * @param string|null $appKey
      * @param array $headers
+     * @param bool $ignoreResponse
      * @return array [status, message, response]
      * @throws HttpException
      */
-    public function get(string $url, array $query = [], Closure $dataValidator = null, string $appKey = null, array $headers = []): array
+    public function get(string $url, array $query = [], Closure $dataValidator = null, string $appKey = null, array $headers = [], bool $ignoreResponse = false): array
     {
-        return $this->request('GET', $url, ['query' => $query, 'headers' => $headers], $appKey, $dataValidator);
+        return $this->request('GET', $url, ['query' => $query, 'headers' => $headers], $appKey, $dataValidator, $ignoreResponse);
     }
 
     /**
@@ -124,10 +127,11 @@ class HttpClient implements HttpClientInterface
      * @param array $options
      * @param string|null $appKey
      * @param Closure|null $dataValidator
+     * @param bool $ignoreResponse
      * @return array [status, message, response]
      * @throws HttpException
      */
-    protected function request(string $method, string $url, array $options, string $appKey = null, Closure $dataValidator = null): array
+    protected function request(string $method, string $url, array $options, string $appKey = null, Closure $dataValidator = null, bool $ignoreResponse = false): array
     {
         $options = array_merge($options, self::DEFAULT_OPTIONS);
 
@@ -140,13 +144,15 @@ class HttpClient implements HttpClientInterface
 
         try {
             $this->httpEvents->beforeRequest($this->traceMessage, $url);
+            $this->traceMessage = null;
 
             $_response = $this->client->request($method, $url, $options);
+
+            if ($ignoreResponse)
+                return [true, 'Ok', null];
+
             $response = $_response->toArray(false);
-
             $this->httpEvents->afterRequest($this->traceMessage, $_response);
-
-            $this->traceMessage = null;
 
         } catch (ClientExceptionInterface | DecodingExceptionInterface | RedirectionExceptionInterface | ServerExceptionInterface | TransportExceptionInterface $e) {
             throw new HttpException(500, $e->getMessage());
