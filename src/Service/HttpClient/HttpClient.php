@@ -148,8 +148,10 @@ class HttpClient implements HttpClientInterface
 
             $_response = $this->client->request($method, $url, $options);
 
-            if ($ignoreResponse)
-                return [true, 'Ok', null];
+            if ($ignoreResponse) {
+                $success = $_response->getStatusCode() == 200;
+                return [$success, $success ? 'Ok' : "Request failed for: $url", null];
+            }
 
             $response = $_response->toArray(false);
             $this->httpEvents->afterRequest($this->traceMessage, $_response);
