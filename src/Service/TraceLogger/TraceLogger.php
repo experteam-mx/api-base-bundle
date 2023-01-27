@@ -201,6 +201,16 @@ class TraceLogger implements TraceLoggerInterface
     }
 
     /**
+     * @return TraceLogger
+     */
+    public function clearTrace(): TraceLogger
+    {
+        $this->trace = [];
+
+        return $this;
+    }
+
+    /**
      * @param string $message
      * @return TraceLogger
      */

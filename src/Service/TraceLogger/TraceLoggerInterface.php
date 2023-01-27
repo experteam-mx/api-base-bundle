@@ -42,6 +42,11 @@ interface TraceLoggerInterface
     public function addTraceWithJsonValue(string $key, $value): TraceLogger;
 
     /**
+     * @return TraceLogger
+     */
+    public function clearTrace(): TraceLogger;
+
+    /**
      * @param string $message
      * @return TraceLogger
      */
