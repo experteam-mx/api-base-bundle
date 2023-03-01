@@ -22,41 +22,47 @@ interface TraceLoggerInterface
     /**
      * @param string $key
      * @param $value
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function addTrace(string $key, $value): TraceLogger;
+    public function addTrace(string $key, $value, string $traceGroup = null): TraceLogger;
 
     /**
      * @param string $key
      * @param $object
      * @param array|null $groups
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function addTraceWithSerializedObject(string $key, $object, array $groups = null): TraceLogger;
+    public function addTraceWithSerializedObject(string $key, $object, array $groups = null, string $traceGroup = null): TraceLogger;
 
     /**
      * @param string $key
      * @param $value
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function addTraceWithJsonValue(string $key, $value): TraceLogger;
+    public function addTraceWithJsonValue(string $key, $value, string $traceGroup = null): TraceLogger;
 
     /**
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function clearTrace(): TraceLogger;
-
-    /**
-     * @param string $message
-     * @return TraceLogger
-     */
-    public function info(string $message): TraceLogger;
+    public function clearTrace(string $traceGroup = null): TraceLogger;
 
     /**
      * @param string $message
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function error(string $message): TraceLogger;
+    public function info(string $message, string $traceGroup = null): TraceLogger;
+
+    /**
+     * @param string $message
+     * @param string|null $traceGroup
+     * @return TraceLogger
+     */
+    public function error(string $message, string $traceGroup = null): TraceLogger;
 
     /**
      * @param Response $response
@@ -70,9 +76,10 @@ interface TraceLoggerInterface
     public function getOptions(): array;
 
     /**
+     * @param string|null $traceGroup
      * @return array
      */
-    public function prepareData(): array;
+    public function prepareData(string $traceGroup = null): array;
 
     /**
      * @return bool

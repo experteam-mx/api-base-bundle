@@ -21,6 +21,8 @@ class TraceLogger implements TraceLoggerInterface
     const TRACE_SUCCESS_RESPONSE = 'traceSuccessResponse';
     const TRACE_REQUESTS = 'traceRequests';
 
+    private const DEFAULT = 'default';
+
     /**
      * @var RequestStack
      */
@@ -163,12 +165,18 @@ class TraceLogger implements TraceLoggerInterface
     /**
      * @param string $key
      * @param $value
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function addTrace(string $key, $value): TraceLogger
+    public function addTrace(string $key, $value, string $traceGroup = null): TraceLogger
     {
+        $group = $traceGroup ?? self::DEFAULT;
+
+        if (!isset($this->trace[$group]))
+            $this->trace[$group] = [];
+
         $now = date_create('now', new DateTimeZone($this->gmtOffset));
-        $this->trace[sprintf('[%s] %s', $now->format('Y-m-d\TH:i:s.v'), $key)] = $value;
+        $this->trace[$group][sprintf('[%s] %s', $now->format('Y-m-d\TH:i:s.v'), $key)] = $value;
 
         return $this;
     }
@@ -177,46 +185,55 @@ class TraceLogger implements TraceLoggerInterface
      * @param string $key
      * @param $object
      * @param array|null $groups
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function addTraceWithSerializedObject(string $key, $object, array $groups = null): TraceLogger
+    public function addTraceWithSerializedObject(string $key, $object, array $groups = null, string $traceGroup = null): TraceLogger
     {
         return $this->addTrace(
             $key,
-            $this->serializeWithCircularRefHandler($object, $groups)
+            $this->serializeWithCircularRefHandler($object, $groups),
+            $traceGroup
         );
     }
 
     /**
      * @param string $key
      * @param $value
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function addTraceWithJsonValue(string $key, $value): TraceLogger
+    public function addTraceWithJsonValue(string $key, $value, string $traceGroup = null): TraceLogger
     {
         return $this->addTrace(
             $key,
-            json_encode($value)
+            json_encode($value),
+            $traceGroup
         );
     }
 
     /**
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function clearTrace(): TraceLogger
+    public function clearTrace(string $traceGroup = null): TraceLogger
     {
-        $this->trace = [];
+        $group = $traceGroup ?? self::DEFAULT;
+
+        if (isset($this->trace[$group]))
+            unset($this->trace[$group]);
 
         return $this;
     }
 
     /**
      * @param string $message
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function info(string $message): TraceLogger
+    public function info(string $message, string $traceGroup = null): TraceLogger
     {
-        $data = $this->prepareData();
+        $data = $this->prepareData($traceGroup);
 
         $this->logger->info($message, $data);
 
@@ -228,11 +245,12 @@ class TraceLogger implements TraceLoggerInterface
 
     /**
      * @param string $message
+     * @param string|null $traceGroup
      * @return TraceLogger
      */
-    public function error(string $message): TraceLogger
+    public function error(string $message, string $traceGroup = null): TraceLogger
     {
-        $data = $this->prepareData();
+        $data = $this->prepareData($traceGroup);
 
         $this->logger->error($message, $data);
 
@@ -270,15 +288,16 @@ class TraceLogger implements TraceLoggerInterface
     }
 
     /**
+     * @param string|null $traceGroup
      * @return array
      */
-    public function prepareData(): array
+    public function prepareData(string $traceGroup = null): array
     {
         return [
             'request' => $this->request,
             'auth' => $this->auth,
             'gmtOffset' => $this->gmtOffset,
-            'trace' => $this->trace,
+            'trace' => $this->trace[$traceGroup ?? self::DEFAULT] ?? [],
             'queries' => $this->doctrinelogger->queries
         ];
     }
