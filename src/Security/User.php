@@ -273,8 +273,8 @@ class User implements UserInterface
      *
      * @see UserInterface
      */
-    public function getUserIdentifier(): ?string
+    public function getUserIdentifier(): string
     {
-        return ($this->token ?? ($this->appkey ?? null));
+        return ($this->token ?? ($this->appkey ?? ''));
     }
 }
