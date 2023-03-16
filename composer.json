@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
+        "php": ">=8.1",
         "ext-json": "*",
         "ext-redis": "*",
         "ext-bcmath": "*",
@@ -20,16 +20,15 @@
         "friendsofsymfony/rest-bundle": "^3.0",
         "nelmio/api-doc-bundle": "^4.0",
         "php-di/phpdoc-reader": "^2.2",
-        "symfony/config": "5.2.*|5.3.*|5.4.*",
-        "symfony/dependency-injection": "5.2.*|5.3.*|5.4.*",
-        "symfony/http-client": "5.2.*|5.3.*|5.4.*",
-        "symfony/http-kernel": "5.2.*|5.3.*|5.4.*",
-        "symfony/security-bundle": "5.2.*|5.3.*|5.4.*",
-        "symfony/security-core": "5.2.*|5.3.*|5.4.*",
-        "symfony/security-guard": "5.2.*|5.3.*|5.4.*",
-        "symfony/serializer": "5.2.*|5.3.*|5.4.*",
-        "symfony/uid": "5.2.*|5.3.*|5.4.*",
-        "symfony/validator": "5.2.*|5.3.*|5.4.*"
+        "symfony/config": "6.2.*",
+        "symfony/dependency-injection": "6.2.*",
+        "symfony/http-client": "6.2.*",
+        "symfony/http-kernel": "6.2.*",
+        "symfony/security-bundle": "6.2.*",
+        "symfony/security-core": "6.2.*",
+        "symfony/serializer": "6.2.*",
+        "symfony/uid": "6.2.*",
+        "symfony/validator": "6.2.*"
     },
     "autoload": {
         "psr-4": {
@@ -42,10 +41,10 @@
         }
     },
     "require-dev": {
-        "symfony/dotenv": "5.2.*|5.3.*",
+        "symfony/dotenv": "6.2.*",
         "symfony/flex": "^1.11",
-        "symfony/framework-bundle": "5.2.*|5.3.*",
-        "symfony/phpunit-bridge": "5.2.*|5.3.*"
+        "symfony/framework-bundle": "6.2.*",
+        "symfony/phpunit-bridge": "6.2.*"
     },
     "config": {
         "allow-plugins": {
