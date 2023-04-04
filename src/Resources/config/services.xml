@@ -108,6 +108,7 @@
             <argument key="$manager" type="service" id="Doctrine\ORM\EntityManagerInterface"/>
             <argument key="$serializer" type="service" id="Symfony\Component\Serializer\SerializerInterface"/>
             <argument key="$logger" type="service" id="Psr\Log\LoggerInterface"/>
+            <argument key="$redis" type="service" id="Redis"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\TraceLogger\TraceLoggerInterface" alias="api_base.trace_logger"/>
 
