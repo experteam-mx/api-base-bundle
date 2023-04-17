@@ -117,11 +117,17 @@ class RequestUtil implements RequestUtilInterface
 
         $reader = new PhpDocReader();
         $validationTypes = [];
+
         foreach ($refClass->getProperties() as $refProperty) {
             $fieldName = $refProperty->getName();
+
             try {
                 $type = $reader->getPropertyType($refProperty);
             } catch (AnnotationException $e) {
+                continue;
+            }
+
+            if (is_null($type)) {
                 continue;
             }
 
@@ -129,6 +135,7 @@ class RequestUtil implements RequestUtilInterface
                 $validationTypes[$fieldName] = new Assert\Type($type == 'float' ? 'numeric' : $type);
             } else {
                 $childType = strpos($type, "[]") === false ? $type : trim(explode('[]', $type)[0]);
+
                 if (in_array($childType, ['string', 'int', 'float'])) {
                     $validationTypes[$fieldName] = [
                         new Assert\Type('array'),
@@ -140,6 +147,7 @@ class RequestUtil implements RequestUtilInterface
                     $_collection->allowMissingFields = true;
                     $_collection->allowExtraFields = true;
                     $validationTypes[$fieldName] = $_collection;
+
                     if (strpos($type, "[]") === false) {
                         $validationTypes[$fieldName] = $_collection;
                     } else {

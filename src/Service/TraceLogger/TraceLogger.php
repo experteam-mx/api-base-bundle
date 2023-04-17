@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Experteam\ApiBaseBundle\Security\User;
 use Experteam\ApiBaseBundle\Service\ELKLogger\ELKLoggerInterface;
 use Psr\Log\LoggerInterface;
+use Redis;
+use RedisException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -20,6 +22,7 @@ class TraceLogger implements TraceLoggerInterface
     const LOG_QUERIES = 'logQueries';
     const TRACE_SUCCESS_RESPONSE = 'traceSuccessResponse';
     const TRACE_REQUESTS = 'traceRequests';
+    const REDIS_CONFIG = 'redisConfig';
 
     private const DEFAULT = 'default';
 
@@ -59,6 +62,12 @@ class TraceLogger implements TraceLoggerInterface
     private $serializer;
 
     /**
+     * @var Redis
+     */
+    private $redis;
+
+
+    /**
      * @var string
      */
     private $gmtOffset = '+00:00';
@@ -85,7 +94,8 @@ class TraceLogger implements TraceLoggerInterface
         self::LOG_TO_KIBANA => false,
         self::LOG_QUERIES => false,
         self::TRACE_SUCCESS_RESPONSE => true,
-        self::TRACE_REQUESTS => false
+        self::TRACE_REQUESTS => false,
+        self::REDIS_CONFIG => false
     ];
 
     /**
@@ -95,7 +105,7 @@ class TraceLogger implements TraceLoggerInterface
 
     public function __construct(RequestStack $requestStack, ELKLoggerInterface $elkLogger, TokenStorageInterface $tokenStorage,
                                 EntityManagerInterface $manager, SerializerInterface $serializer,
-                                LoggerInterface $logger)
+                                LoggerInterface $logger, Redis $redis)
     {
         $this->logger = $logger;
         $this->requestStack = $requestStack;
@@ -104,6 +114,7 @@ class TraceLogger implements TraceLoggerInterface
         $this->manager = $manager;
         $this->serializer = $serializer;
         $this->doctrinelogger = new DebugStack();
+        $this->redis = $redis;
     }
 
     /**
@@ -293,13 +304,38 @@ class TraceLogger implements TraceLoggerInterface
      */
     public function prepareData(string $traceGroup = null): array
     {
-        return [
+        return array_merge([
             'request' => $this->request,
             'auth' => $this->auth,
             'gmtOffset' => $this->gmtOffset,
             'trace' => $this->trace[$traceGroup ?? self::DEFAULT] ?? [],
             'queries' => $this->doctrinelogger->queries
-        ];
+        ], $this->getRedisConfig() ?? []);
+    }
+
+    protected function getRedisConfig(): ?array
+    {
+        if (!$this->options[self::REDIS_CONFIG])
+            return null;
+
+        $traceKey = 'redis_config';
+        try {
+            return [
+                $traceKey => [
+                    'host' => $this->redis->getHost(),
+                    'port' => $this->redis->getPort(),
+                    'db' => $this->redis->getDbNum(),
+                    'auth' => $this->redis->getAuth(),
+                    'last_error' => $this->redis->getLastError()
+                ]
+            ];
+        } catch (RedisException $e) {
+            return [
+                $traceKey => [
+                    'exception' => $e->getMessage()
+                ]
+            ];
+        }
     }
 
     /**
