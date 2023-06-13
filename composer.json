@@ -20,15 +20,21 @@
         "friendsofsymfony/rest-bundle": "^3.0",
         "nelmio/api-doc-bundle": "^4.0",
         "php-di/phpdoc-reader": "^2.2",
-        "symfony/config": "6.2.*",
-        "symfony/dependency-injection": "6.2.*",
-        "symfony/http-client": "6.2.*",
-        "symfony/http-kernel": "6.2.*",
-        "symfony/security-bundle": "6.2.*",
-        "symfony/security-core": "6.2.*",
-        "symfony/serializer": "6.2.*",
-        "symfony/uid": "6.2.*",
-        "symfony/validator": "6.2.*"
+        "symfony/config": "6.3.*",
+        "symfony/dependency-injection": "6.3.*",
+        "symfony/http-client": "6.3.*",
+        "symfony/http-kernel": "6.3.*",
+        "symfony/security-bundle": "6.3.*",
+        "symfony/security-core": "6.3.*",
+        "symfony/serializer": "6.3.*",
+        "symfony/uid": "6.3.*",
+        "symfony/validator": "6.3.*"
+    },
+    "require-dev": {
+        "symfony/dotenv": "6.3.*",
+        "symfony/flex": "^1.11",
+        "symfony/framework-bundle": "6.3.*",
+        "symfony/phpunit-bridge": "6.3.*"
     },
     "autoload": {
         "psr-4": {
@@ -39,12 +45,6 @@
         "psr-4": {
             "Experteam\\ApiBaseBundle\\Tests\\": "tests/"
         }
-    },
-    "require-dev": {
-        "symfony/dotenv": "6.2.*",
-        "symfony/flex": "^1.11",
-        "symfony/framework-bundle": "6.2.*",
-        "symfony/phpunit-bridge": "6.2.*"
     },
     "config": {
         "allow-plugins": {
