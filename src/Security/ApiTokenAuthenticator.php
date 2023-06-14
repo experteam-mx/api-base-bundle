@@ -14,7 +14,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -26,27 +25,27 @@ class ApiTokenAuthenticator extends AbstractAuthenticator implements Authenticat
     /**
      * @var ELKLoggerInterface
      */
-    protected $logger;
+    protected ELKLoggerInterface $logger;
 
     /**
      * @var AuthenticateInterface
      */
-    protected $authenticate;
+    protected AuthenticateInterface $authenticate;
 
     /**
      * @var array
      */
-    private $appKeyConfig;
+    private array $appKeyConfig;
 
     /**
      * @var array
      */
-    private $authConfig;
+    private array $authConfig;
 
     /**
      * @var int
      */
-    private $authType = Authenticate::AUTH_TOKEN;
+    private int $authType = Authenticate::AUTH_TOKEN;
 
     /**
      * @param ParameterBagInterface $parameterBag
@@ -68,10 +67,10 @@ class ApiTokenAuthenticator extends AbstractAuthenticator implements Authenticat
     private function getCredentials(Request $request): string
     {
         // skip beyond "Bearer "
-        $credentials = substr($request->headers->get('Authorization'), 7);
+        $credentials = substr($request->headers->get('Authorization', ''), 7);
 
         if (empty($credentials)) {
-            $credentials = $request->headers->get('AppKey');
+            $credentials = $request->headers->get('AppKey', '');
             $this->authType = Authenticate::AUTH_APP_KEY;
         }
 
@@ -134,7 +133,7 @@ class ApiTokenAuthenticator extends AbstractAuthenticator implements Authenticat
     {
         // look for header "Authorization: Bearer <token>" or "AppKey: <key>"
         return (!isset($_ENV['APP_SECURITY_ACCESS_ROLE']) || $_ENV['APP_SECURITY_ACCESS_ROLE'] !== 'IS_ANONYMOUS')
-            && (($request->headers->has('Authorization') && 0 === strpos($request->headers->get('Authorization'), 'Bearer '))
+            && (($request->headers->has('Authorization') && str_starts_with($request->headers->get('Authorization', ''), 'Bearer '))
                 || ($this->appKeyConfig['enabled'] && $request->headers->has('AppKey')));
     }
 
