@@ -113,7 +113,7 @@ class JSend implements JSendInterface
         }
 
         $response->setStatusCode($statusCode);
-        $response->setContent(json_encode($content));
+        $response->setContent(json_encode($content, JSON_ERROR_NONE | JSON_UNESCAPED_SLASHES));
 
         $headers = [
             'X-Content-Type-Options' => 'nosniff',
