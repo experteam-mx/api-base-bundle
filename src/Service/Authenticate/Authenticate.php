@@ -6,7 +6,7 @@ use Experteam\ApiBaseBundle\Security\User;
 use Redis;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 
@@ -99,7 +99,7 @@ class Authenticate implements AuthenticateInterface
 
     protected function setTokenAuthentication(User $user)
     {
-        $this->tokenStorage->setToken(new PostAuthenticationGuardToken(
+        $this->tokenStorage->setToken(new PostAuthenticationToken(
             $user,
             'main',
             $user->getRoles()
