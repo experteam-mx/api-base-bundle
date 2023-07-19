@@ -40,12 +40,31 @@ class JSend implements JSendInterface
      */
     protected $transaction;
 
+    /**
+     * @param ELKLoggerInterface $elkLogger
+     * @param RequestStack $requestStack
+     * @param ParameterBagInterface $parameterBag
+     * @param TransactionInterface $transaction
+     */
     public function __construct(ELKLoggerInterface $elkLogger, RequestStack $requestStack, ParameterBagInterface $parameterBag, TransactionInterface $transaction)
     {
         $this->logger = $elkLogger;
         $this->requestStack = $requestStack;
         $this->parameterBag = $parameterBag;
         $this->transaction = $transaction;
+    }
+
+    /**
+     * @param Response $response
+     * @return void
+     */
+    private function adjustContentLanguageHeader(Response $response)
+    {
+        $key = 'Content-Language';
+
+        if ($response->headers->has($key)) {
+            $response->headers->set($key, str_replace('_', '-', $response->headers->get($key)));
+        }
     }
 
     /**
@@ -126,6 +145,7 @@ class JSend implements JSendInterface
         }
 
         $response->headers->add($headers);
+        $this->adjustContentLanguageHeader($response);
     }
 
     /**
