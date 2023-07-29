@@ -78,4 +78,9 @@ class BaseController extends AbstractFOSRestController
         $jsonEncoder = new JsonEncoder();
         return $jsonEncoder->encode($data, 'json');
     }
+
+    protected function denyAccessUnlessGrantedCustom(mixed $attribute, mixed $subject = null, string $message = 'Forbidden.'): void
+    {
+        $this->denyAccessUnlessGranted($attribute, $subject, $message);
+    }
 }
