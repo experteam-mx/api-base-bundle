@@ -193,7 +193,7 @@ class Common
      * @param HttpClientInterface $httpClient
      * @param string $method
      * @param string $url
-     * @param User $user
+     * @param User|null $user
      * @param string|array $payload
      * @param array $result
      * @param bool $checkData
@@ -201,13 +201,16 @@ class Common
      * @param array|null $headers
      * @return array
      */
-    public static function httpRequest(HttpClientInterface $httpClient, string $method, string $url, User $user, string|array $payload, array $result = [Literal::SUCCESS => false], bool $checkData = true, string $serviceName = '', array $headers = null): array
+    public static function httpRequest(HttpClientInterface $httpClient, string $method, string $url, ?User $user, string|array $payload, array $result = [Literal::SUCCESS => false], bool $checkData = true, string $serviceName = '', array $headers = null): array
     {
         try {
             $options = [
-                'auth_bearer' => $user->getToken(),
                 (($method === 'GET') ? 'query' : 'body') => $payload
             ];
+
+            if (!is_null($user)) {
+                $options['auth_bearer'] = $user->getToken();
+            }
 
             if (!is_null($headers)) {
                 $options['headers'] = $headers;
@@ -235,7 +238,7 @@ class Common
             switch ($status) {
                 case 'fail':
                     if (isset($content[Literal::DATA])) {
-                        $content[Literal::DATA][Literal::MESSAGE] = $messagePrefix . (isset($content[Literal::DATA][Literal::MESSAGE]) ? $content[Literal::DATA][Literal::MESSAGE] : 'Request validation failed.');
+                        $content[Literal::DATA][Literal::MESSAGE] = $messagePrefix . ($content[Literal::DATA][Literal::MESSAGE] ?? 'Request validation failed.');
                         $result[Literal::MESSAGE] = json_encode($content[Literal::DATA]);
                     }
 
