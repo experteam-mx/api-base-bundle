@@ -11,23 +11,24 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BaseController extends AbstractFOSRestController
 {
     /**
      * @var ParamInterface
      */
-    protected $param;
+    protected ParamInterface $param;
 
     /**
      * @var RequestUtilInterface
      */
-    protected $requestUtil;
+    protected RequestUtilInterface $requestUtil;
 
     /**
      * @var HttpClientInterface
      */
-    protected $httpClient;
+    protected HttpClientInterface $httpClient;
 
     /**
      * @var Serializer
@@ -35,15 +36,22 @@ class BaseController extends AbstractFOSRestController
     protected Serializer $serializer;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected TranslatorInterface $translator;
+
+    /**
      * @param ParamInterface $param
      * @param RequestUtilInterface $requestUtil
      * @param HttpClientInterface $httpClient
+     * @param TranslatorInterface $translator
      */
-    public function __construct(ParamInterface $param, RequestUtilInterface $requestUtil, HttpClientInterface $httpClient)
+    public function __construct(ParamInterface $param, RequestUtilInterface $requestUtil, HttpClientInterface $httpClient, TranslatorInterface $translator)
     {
         $this->param = $param;
         $this->requestUtil = $requestUtil;
         $this->httpClient = $httpClient;
+        $this->translator = $translator;
         $this->serializer = new Serializer([new ObjectNormalizer()]);
     }
 
@@ -51,7 +59,7 @@ class BaseController extends AbstractFOSRestController
      * @param string $data
      * @return mixed
      */
-    protected function jsonDecode(string $data)
+    protected function jsonDecode(string $data): mixed
     {
         $jsonEncoder = new JsonEncoder();
         return $jsonEncoder->decode($data, 'json');
@@ -81,7 +89,7 @@ class BaseController extends AbstractFOSRestController
      * @param mixed $data
      * @return string
      */
-    protected function jsonEncode($data): string
+    protected function jsonEncode(mixed $data): string
     {
         $jsonEncoder = new JsonEncoder();
         return $jsonEncoder->encode($data, 'json');
