@@ -19,13 +19,17 @@ class RequestUtil implements RequestUtilInterface
     /**
      * @var SerializerInterface
      */
-    private $serializer;
+    private SerializerInterface $serializer;
 
     /**
      * @var ValidatorInterface
      */
-    private $validator;
+    private ValidatorInterface $validator;
 
+    /**
+     * @param SerializerInterface $serializer
+     * @param ValidatorInterface $validator
+     */
     public function __construct(SerializerInterface $serializer, ValidatorInterface $validator)
     {
         $this->serializer = $serializer;
@@ -51,7 +55,7 @@ class RequestUtil implements RequestUtilInterface
             ]);
         } catch (Exception $e) {
             $message = $e->getMessage();
-            throw new BadRequestHttpException("Invalid body: $message" . ((substr($message, -1) == '.') ? '' : '.'));
+            throw new BadRequestHttpException("Invalid body: $message" . (str_ends_with($message, '.') ? '' : '.'));
         }
 
         $errors = $this->validator->validate($object);
@@ -76,9 +80,14 @@ class RequestUtil implements RequestUtilInterface
      * @param bool $throwException
      * @return array
      */
-    protected function validateDataTypes(string $data, string $model, bool $throwException = true)
+    protected function validateDataTypes(string $data, string $model, bool $throwException = true): array
     {
         $validationTypes = $this->getValidationTypes($model);
+
+        if (empty($validationTypes)) {
+            return [];
+        }
+
         $constraints = new Assert\Collection($validationTypes);
         $constraints->allowExtraFields = true;
         $constraints->allowMissingFields = true;
@@ -87,8 +96,8 @@ class RequestUtil implements RequestUtilInterface
         $processedErrors = [];
 
         if ($validationErrors->count() > 0) {
-
             $errors = [];
+
             foreach ($validationErrors as $violation) {
                 $errors[$this->formatPropertyPath($violation->getPropertyPath())] = $violation->getMessage();
             }
@@ -107,11 +116,11 @@ class RequestUtil implements RequestUtilInterface
      * @param string $model
      * @return array
      */
-    private function getValidationTypes(string $model)
+    private function getValidationTypes(string $model): array
     {
         try {
             $refClass = new ReflectionClass($model);
-        } catch (ReflectionException $e) {
+        } catch (ReflectionException) {
             return [];
         }
 
@@ -123,7 +132,7 @@ class RequestUtil implements RequestUtilInterface
 
             try {
                 $type = $reader->getPropertyType($refProperty);
-            } catch (AnnotationException $e) {
+            } catch (AnnotationException) {
                 continue;
             }
 
@@ -134,7 +143,7 @@ class RequestUtil implements RequestUtilInterface
             if (in_array($type, ['string', 'int', 'float', 'bool', 'array'])) {
                 $validationTypes[$fieldName] = new Assert\Type($type == 'float' ? 'numeric' : $type);
             } else {
-                $childType = strpos($type, "[]") === false ? $type : trim(explode('[]', $type)[0]);
+                $childType = (!str_contains($type, "[]") ? $type : trim(explode('[]', $type)[0]));
 
                 if (in_array($childType, ['string', 'int', 'float'])) {
                     $validationTypes[$fieldName] = [
@@ -148,7 +157,7 @@ class RequestUtil implements RequestUtilInterface
                     $_collection->allowExtraFields = true;
                     $validationTypes[$fieldName] = $_collection;
 
-                    if (strpos($type, "[]") === false) {
+                    if (!str_contains($type, "[]")) {
                         $validationTypes[$fieldName] = $_collection;
                     } else {
                         $validationTypes[$fieldName] = [
@@ -167,7 +176,7 @@ class RequestUtil implements RequestUtilInterface
      * @param string $propertyPath
      * @return string
      */
-    private function formatPropertyPath(string $propertyPath)
+    private function formatPropertyPath(string $propertyPath): string
     {
         $property = '';
         foreach (explode('][', substr($propertyPath, 1, -1)) as $prop) {
