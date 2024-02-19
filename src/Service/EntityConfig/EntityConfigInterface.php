@@ -4,16 +4,7 @@ namespace Experteam\ApiBaseBundle\Service\EntityConfig;
 
 interface EntityConfigInterface
 {
-    /**
-     * @param string $entity
-     * @param int $id
-     * @return bool
-     */
-    public function isActive(string $entity, int $id): bool;
+    public function isActive(string $entity, int $id, bool $getModelDataFromSession = true, array $modelData = []): bool;
 
-    /**
-     * @param string $entity
-     * @return array
-     */
-    public function getActives(string $entity): array;
+    public function getActives(string $entity, bool $getModelDataFromSession = true, array $modelData = []): array;
 }
