@@ -143,7 +143,7 @@ class RequestUtil implements RequestUtilInterface
             if (in_array($type, ['string', 'int', 'float', 'bool', 'array'])) {
                 $validationTypes[$fieldName] = new Assert\Type($type == 'float' ? 'numeric' : $type);
             } else {
-                $childType = (!str_contains($type, "[]") ? $type : trim(explode('[]', $type)[0]));
+                $childType = (!str_contains($type, '[]') ? $type : trim(explode('[]', $type)[0]));
 
                 if (in_array($childType, ['string', 'int', 'float'])) {
                     $validationTypes[$fieldName] = [
@@ -155,16 +155,11 @@ class RequestUtil implements RequestUtilInterface
                     $_collection = new Assert\Collection($_validationTypes);
                     $_collection->allowMissingFields = true;
                     $_collection->allowExtraFields = true;
-                    $validationTypes[$fieldName] = $_collection;
 
-                    if (!str_contains($type, "[]")) {
-                        $validationTypes[$fieldName] = $_collection;
-                    } else {
-                        $validationTypes[$fieldName] = [
-                            new Assert\Type('array'),
-                            new Assert\All([$_collection])
-                        ];
-                    }
+                    $validationTypes[$fieldName] = (!str_contains($type, '[]') ? $_collection : [
+                        new Assert\Type('array'),
+                        new Assert\All([$_collection])
+                    ]);
                 }
             }
         }
