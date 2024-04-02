@@ -152,14 +152,17 @@ class RequestUtil implements RequestUtilInterface
                     ];
                 } elseif (class_exists($childType)) {
                     $_validationTypes = $this->getValidationTypes($childType);
-                    $_collection = new Assert\Collection($_validationTypes);
-                    $_collection->allowMissingFields = true;
-                    $_collection->allowExtraFields = true;
 
-                    $validationTypes[$fieldName] = (!str_contains($type, '[]') ? $_collection : [
-                        new Assert\Type('array'),
-                        new Assert\All([$_collection])
-                    ]);
+                    if (!empty($_validationTypes)) {
+                        $_collection = new Assert\Collection($_validationTypes);
+                        $_collection->allowMissingFields = true;
+                        $_collection->allowExtraFields = true;
+
+                        $validationTypes[$fieldName] = (!str_contains($type, '[]') ? $_collection : [
+                            new Assert\Type('array'),
+                            new Assert\All([$_collection])
+                        ]);
+                    }
                 }
             }
         }
