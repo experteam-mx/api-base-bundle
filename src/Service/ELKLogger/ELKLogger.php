@@ -46,7 +46,7 @@ class ELKLogger implements ELKLoggerInterface
         if (!isset($this->context)) {
             $cfgParams = $this->parameterBag->get('experteam_api_base.elk_logger');
             $request = $this->requestStack->getCurrentRequest();
-            $transactionId = (!is_null($request) ? $request->get('transaction_id') : null);
+            $transactionId = (!is_null($request) && $request->headers->has('Transaction-Id') ? $request->headers->get('Transaction-Id') : null);
 
             $this->context = [
                 'id' => (empty($transactionId) ? uniqid() : $transactionId),
