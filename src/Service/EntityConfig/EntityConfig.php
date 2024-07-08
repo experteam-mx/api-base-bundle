@@ -73,7 +73,7 @@ class EntityConfig implements EntityConfigInterface
 
             $levelConfigured = $this->redis->hGet("companies.{$entity}Entity:$modelType", strval($modelId));
 
-            if ($levelConfigured === false) {
+            if (is_null($levelConfigured) || $levelConfigured === false) {
                 continue;
             }
 
