@@ -10,38 +10,25 @@ use ReflectionException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
 class RequestUtil implements RequestUtilInterface
 {
-    /**
-     * @var SerializerInterface
-     */
-    private SerializerInterface $serializer;
-
-    /**
-     * @var ValidatorInterface
-     */
-    private ValidatorInterface $validator;
-
-    /**
-     * @param SerializerInterface $serializer
-     * @param ValidatorInterface $validator
-     */
-    public function __construct(SerializerInterface $serializer, ValidatorInterface $validator)
+    public function __construct(
+        private readonly SerializerInterface $serializer,
+        private readonly ValidatorInterface  $validator)
     {
-        $this->serializer = $serializer;
-        $this->validator = $validator;
     }
 
     /**
      * @param string $data
      * @param string $model
+     * @param string[]|null $groups
      * @return object
      */
-    public function validate(string $data, string $model): object
+    public function validate(string $data, string $model, ?array $groups = null): object
     {
         if (!$data) {
             throw new BadRequestHttpException('Empty body.');
@@ -58,7 +45,7 @@ class RequestUtil implements RequestUtilInterface
             throw new BadRequestHttpException("Invalid body: $message" . (str_ends_with($message, '.') ? '' : '.'));
         }
 
-        $errors = $this->validator->validate($object);
+        $errors = $this->validator->validate($object, null, $groups);
 
         if ($errors->count()) {
             $_errors = [];
@@ -74,12 +61,6 @@ class RequestUtil implements RequestUtilInterface
         return $object;
     }
 
-    /**
-     * @param string $data
-     * @param string $model
-     * @param bool $throwException
-     * @return array
-     */
     protected function validateDataTypes(string $data, string $model, bool $throwException = true): array
     {
         $validationTypes = $this->getValidationTypes($model);
@@ -112,10 +93,6 @@ class RequestUtil implements RequestUtilInterface
         return $processedErrors;
     }
 
-    /**
-     * @param string $model
-     * @return array
-     */
     private function getValidationTypes(string $model): array
     {
         try {
@@ -170,10 +147,6 @@ class RequestUtil implements RequestUtilInterface
         return $validationTypes;
     }
 
-    /**
-     * @param string $propertyPath
-     * @return string
-     */
     private function formatPropertyPath(string $propertyPath): string
     {
         $property = '';
@@ -183,10 +156,6 @@ class RequestUtil implements RequestUtilInterface
         return ltrim($property, '.');
     }
 
-    /**
-     * @param array $errors
-     * @return array
-     */
     public function buildMessages(array $errors): array
     {
         $result = [];
