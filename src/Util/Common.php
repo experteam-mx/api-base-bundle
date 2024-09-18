@@ -199,13 +199,14 @@ class Common
      * @param bool $checkData
      * @param string $serviceName
      * @param array|null $headers
+     * @param bool $jsonContentType
      * @return array
      */
-    public static function httpRequest(HttpClientInterface $httpClient, string $method, string $url, ?User $user, string|array $payload, array $result = [Literal::SUCCESS => false], bool $checkData = true, string $serviceName = '', array $headers = null): array
+    public static function httpRequest(HttpClientInterface $httpClient, string $method, string $url, ?User $user, string|array $payload, array $result = [Literal::SUCCESS => false], bool $checkData = true, string $serviceName = '', array $headers = null, bool $jsonContentType = false): array
     {
         try {
             $options = [
-                (($method === 'GET') ? 'query' : 'body') => $payload
+                (($method === 'GET') ? 'query' : ($jsonContentType ? 'json' : 'body')) => $payload
             ];
 
             if (!is_null($user)) {
