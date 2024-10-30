@@ -36,7 +36,9 @@ composer require experteam/api-base-bundle
 ```
 experteam_api_base:
     params:
-        remote_url: [Remote URL]
+        remote:
+            enabled: [Enabled]
+            url: [URL]
         defaults:
             [PARAM NAME]: [Value]
             [PARAM NAME]: [Value]

@@ -64,9 +64,10 @@ class Param implements ParamInterface
     {
         $result = [];
         $cfgParams = $this->parameterBag->get('experteam_api_base.params');
-        $url = ($cfgParams['remote_url'] ?? null);
+        $enabled = ($cfgParams['remote']['enabled'] ?? false);
+        $url = ($cfgParams['remote']['url'] ?? null);
 
-        if (Validation::createValidator()->validate($url, [new Assert\Url(), new Assert\NotNull()])->count() == 0) {
+        if (is_bool($enabled) && $enabled && Validation::createValidator()->validate($url, [new Assert\Url(), new Assert\NotNull()])->count() == 0) {
             $token = $this->tokenStorage->getToken();
 
             if (!is_null($token)) {

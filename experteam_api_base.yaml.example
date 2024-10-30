@@ -1,6 +1,8 @@
 experteam_api_base:
     params:
-        remote_url: http://api_companies:8080/api/parameters-values
+        remote:
+            enabled: true
+            url: http://api_companies:8080/api/parameters-values
 #        defaults:
 #            API_CRAMX_LOGIN: gabymx|Dhl12345|ACG
 #            DROPOFF_PRODUCTS_RESTRICTED: 7
