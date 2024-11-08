@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use Experteam\ApiBaseBundle\Security\User;
+use PDO;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -272,5 +273,28 @@ class Common
     {
         $jsonEncoder = new JsonEncoder();
         return $jsonEncoder->encode($data, 'json');
+    }
+
+    public static function createDbh(): ?PDO
+    {
+        $dbUrl = $_ENV['DATABASE_URL'];
+        $dbUrlPart = explode('://', $dbUrl);
+
+        if ($dbUrlPart[0] !== 'mssql') {
+            return null;
+        }
+
+        $dbUrlPart1 = $dbUrlPart[1];
+        $dbUrlPart2 = explode('/', $dbUrlPart1);
+        $database = $dbUrlPart2[1];
+        $dbUrlPart3 = explode('@', $dbUrlPart2[0]);
+        $dbUrlPart4 = explode(':', $dbUrlPart3[1]);
+        $host = $dbUrlPart4[0];
+        $port = ($dbUrlPart4[1] ?? null);
+        $dbUrlPart5 = explode(':', $dbUrlPart3[0]);
+        $username = $dbUrlPart5[0];
+        $passwd = $dbUrlPart5[1];
+        $server = $host . (is_null($port) ? '' : ",$port");
+        return new PDO("sqlsrv:Server=$server;Database=$database;TrustServerCertificate=1", $username, $passwd);
     }
 }
