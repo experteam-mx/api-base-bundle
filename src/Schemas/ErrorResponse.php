@@ -2,17 +2,13 @@
 
 namespace Experteam\ApiBaseBundle\Schemas;
 
-use OpenApi\Annotations as OA;
+use OpenApi\Attributes as OA;
 
 class ErrorResponse
 {
-    /**
-     * @OA\Property(type="string", example="error")
-     */
+    #[OA\Property(type: 'string', example: 'error')]
     public $status;
 
-    /**
-     * @OA\Property(type="string", example="Error message")
-     */
+    #[OA\Property(type: 'string', example: 'Error message')]
     public $message;
 }

@@ -2,17 +2,13 @@
 
 namespace Experteam\ApiBaseBundle\Schemas;
 
-use OpenApi\Annotations as OA;
+use OpenApi\Attributes as OA;
 
 class SuccessResponse
 {
-    /**
-     * @OA\Property(type="string", example="success")
-     */
+    #[OA\Property(type: 'string', example: 'success')]
     public $status;
 
-    /**
-     * @OA\Property(type="array", @OA\Items(), example={})
-     */
+    #[OA\Property(type: 'array', items: new OA\Items(), example: [])]
     public $data;
 }
