@@ -120,5 +120,8 @@
             <argument key="$httpClient" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\DelayAlert\DelayAlertInterface" alias="api_base.delay_alert"/>
+
+        <service id="api_base.xml_reader" class="Experteam\ApiBaseBundle\Service\XmlReader\XmlReader" public="true"/>
+        <service id="Experteam\ApiBaseBundle\Service\XmlReader\XmlReaderInterface" alias="api_base.xml_reader"/>
     </services>
 </container>
