@@ -6,34 +6,22 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class User implements UserInterface
 {
-    private $id;
-
-    private $name;
-
-    private $username;
-
-    private $created_at;
-
-    private $updated_at;
-
-    private $token;
-
-    private $appkey;
-
-    private $roles = [];
-
-    private $model_type;
-
-    private $model_id;
-
-    private $auth_type;
-
-    private $language_id;
-
-    /**
-     * @var array
-     */
-    private $session;
+    private ?int $id = null;
+    private ?string $name = null;
+    private ?string $username = null;
+    private ?string $created_at = null;
+    private ?string $updated_at = null;
+    private ?string $token = null;
+    private ?string $appkey = null;
+    private array $roles = [];
+    private ?string $model_type = null;
+    private ?int $model_id = null;
+    private ?string $auth_type = null;
+    private ?int $language_id = null;
+    private ?array $session = null;
+    private ?bool $is_active = null;
+    private ?string $email = null;
+    private ?array $role = null;
 
     public function __construct(array $properties = [])
     {
@@ -47,7 +35,7 @@ class User implements UserInterface
         return $this->id;
     }
 
-    public function setId(int $id): self
+    public function setId(int $id): static
     {
         $this->id = $id;
 
@@ -59,7 +47,7 @@ class User implements UserInterface
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -76,7 +64,7 @@ class User implements UserInterface
         return $this->username;
     }
 
-    public function setUsername(string $username): self
+    public function setUsername(string $username): static
     {
         $this->username = $username;
 
@@ -88,7 +76,7 @@ class User implements UserInterface
         return $this->created_at;
     }
 
-    public function setCreatedAt(string $created_at): self
+    public function setCreatedAt(string $created_at): static
     {
         $this->created_at = $created_at;
 
@@ -100,7 +88,7 @@ class User implements UserInterface
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(string $updated_at): self
+    public function setUpdatedAt(string $updated_at): static
     {
         $this->updated_at = $updated_at;
 
@@ -112,7 +100,7 @@ class User implements UserInterface
         return $this->token;
     }
 
-    public function setToken(string $token): self
+    public function setToken(string $token): static
     {
         $this->token = $token;
 
@@ -124,10 +112,10 @@ class User implements UserInterface
      */
     public function getRoles(): array
     {
-        return (array)$this->roles;
+        return $this->roles;
     }
 
-    public function setRoles(array $roles): self
+    public function setRoles(array $roles): static
     {
         $this->roles = $roles;
 
@@ -161,95 +149,60 @@ class User implements UserInterface
         // $this->plainPassword = null;
     }
 
-    /**
-     * @return array
-     */
     public function getSession(): ?array
     {
         return $this->session;
     }
 
-    /**
-     * @param array|null $session
-     * @return $this
-     */
-    public function setSession(?array $session): self
+    public function setSession(?array $session): static
     {
         $this->session = $session;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getModelType(): ?string
     {
         return $this->model_type;
     }
 
-    /**
-     * @param string|null $model_type
-     * @return $this
-     */
-    public function setModelType(?string $model_type): self
+    public function setModelType(?string $model_type): static
     {
         $this->model_type = $model_type;
 
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getModelId(): ?int
     {
         return $this->model_id;
     }
 
-    /**
-     * @param int|null $model_id
-     * @return $this
-     */
-    public function setModelId(?int $model_id): self
+    public function setModelId(?int $model_id): static
     {
         $this->model_id = $model_id;
 
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getAuthType(): ?string
     {
         return $this->auth_type;
     }
 
-    /**
-     * @param string|null $auth_type
-     * @return $this
-     */
-    public function setAuthType(?string $auth_type): self
+    public function setAuthType(?string $auth_type): static
     {
         $this->auth_type = $auth_type;
 
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getLanguageId(): ?int
     {
         return $this->language_id;
     }
 
-    /**
-     * @param int|null $language_id
-     * @return $this
-     */
-    public function setLanguageId(?int $language_id): self
+    public function setLanguageId(?int $language_id): static
     {
         $this->language_id = $language_id;
 
@@ -261,7 +214,7 @@ class User implements UserInterface
         return $this->appkey;
     }
 
-    public function setAppkey($appkey): self
+    public function setAppkey(?string $appkey): static
     {
         $this->appkey = $appkey;
 
@@ -276,5 +229,41 @@ class User implements UserInterface
     public function getUserIdentifier(): string
     {
         return ($this->token ?? ($this->appkey ?? ''));
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->is_active;
+    }
+
+    public function setIsActive(?bool $is_active): static
+    {
+        $this->is_active = $is_active;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getRole(): ?array
+    {
+        return $this->role;
+    }
+
+    public function setRole(?array $role): static
+    {
+        $this->role = $role;
+
+        return $this;
     }
 }
