@@ -10,40 +10,29 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class ELKLogger implements ELKLoggerInterface
 {
-    /**
-     * @var LoggerInterface
-     */
-    protected $appLogger;
+    private array $context = [];
 
-    /**
-     * @var ParameterBagInterface
-     */
-    protected $parameterBag;
-
-    /**
-     * @var TokenStorageInterface
-     */
-    protected $tokenStorage;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    public function __construct(LoggerInterface $appLogger, RequestStack $requestStack, TokenStorageInterface $tokenStorage, ParameterBagInterface $parameterBag)
+    public function __construct(
+        private readonly LoggerInterface       $appLogger,
+        private readonly RequestStack          $requestStack,
+        private readonly TokenStorageInterface $tokenStorage,
+        private readonly ParameterBagInterface $parameterBag
+    )
     {
-        $this->appLogger = $appLogger;
-        $this->parameterBag = $parameterBag;
-        $this->tokenStorage = $tokenStorage;
-        $this->requestStack = $requestStack;
     }
 
-    /**
-     * @return array
-     */
-    protected function getContext()
+    public function infoLog(string $message, array $data = []): void
     {
-        if (!isset($this->context)) {
+        $this->appLogger->info($message, array_merge(
+            $this->getContext(),
+            ['timestamp' => date_create()],
+            $data
+        ));
+    }
+
+    protected function getContext(): array
+    {
+        if (empty($this->context)) {
             $cfgParams = $this->parameterBag->get('experteam_api_base.elk_logger');
             $request = $this->requestStack->getCurrentRequest();
             $transactionId = (!is_null($request) && $request->headers->has('Transaction-Id') ? $request->headers->get('Transaction-Id') : null);
@@ -71,23 +60,6 @@ class ELKLogger implements ELKLoggerInterface
         return $this->context;
     }
 
-    /**
-     * @param string $message
-     * @param array $data
-     */
-    public function infoLog(string $message, array $data = []): void
-    {
-        $this->appLogger->info($message, array_merge(
-            $this->getContext(),
-            ['timestamp' => date_create()],
-            $data
-        ));
-    }
-
-    /**
-     * @param string $message
-     * @param array $data
-     */
     public function debugLog(string $message, array $data = []): void
     {
         $this->appLogger->debug($message, array_merge(
@@ -97,10 +69,6 @@ class ELKLogger implements ELKLoggerInterface
         ));
     }
 
-    /**
-     * @param string $message
-     * @param array $data
-     */
     public function warningLog(string $message, array $data = []): void
     {
         $this->appLogger->warning($message, array_merge(
@@ -110,10 +78,6 @@ class ELKLogger implements ELKLoggerInterface
         ));
     }
 
-    /**
-     * @param string $message
-     * @param array $data
-     */
     public function errorLog(string $message, array $data = []): void
     {
         $this->appLogger->error($message, array_merge(
@@ -123,10 +87,6 @@ class ELKLogger implements ELKLoggerInterface
         ));
     }
 
-    /**
-     * @param string $message
-     * @param array $data
-     */
     public function criticalLog(string $message, array $data = []): void
     {
         $this->appLogger->critical($message, array_merge(
@@ -136,10 +96,6 @@ class ELKLogger implements ELKLoggerInterface
         ));
     }
 
-    /**
-     * @param string $message
-     * @param array $data
-     */
     public function noticeLog(string $message, array $data = []): void
     {
         $this->appLogger
