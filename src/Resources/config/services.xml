@@ -124,6 +124,6 @@
         <service id="api_base.xml_reader" class="Experteam\ApiBaseBundle\Service\XmlReader\XmlReader" public="true"/>
         <service id="Experteam\ApiBaseBundle\Service\XmlReader\XmlReaderInterface" alias="api_base.xml_reader"/>
 
-        <service class="Experteam\ApiBaseBundle\DataTransformer\FloatToStringTransformer"/>
+        <service id="Experteam\ApiBaseBundle\DataTransformer\FloatToStringTransformer"/>
     </services>
 </container>
