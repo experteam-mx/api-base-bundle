@@ -121,6 +121,6 @@
         </service>
         <service id="Experteam\ApiBaseBundle\Service\DelayAlert\DelayAlertInterface" alias="api_base.delay_alert"/>
 
-        <service class="Experteam\ApiBaseBundle\DataTransformer\FloatToStringTransformer"/>
+        <service id="Experteam\ApiBaseBundle\DataTransformer\FloatToStringTransformer"/>
     </services>
 </container>
