@@ -120,5 +120,7 @@
             <argument key="$httpClient" type="service" id="Symfony\Contracts\HttpClient\HttpClientInterface"/>
         </service>
         <service id="Experteam\ApiBaseBundle\Service\DelayAlert\DelayAlertInterface" alias="api_base.delay_alert"/>
+
+        <service class="Experteam\ApiBaseBundle\DataTransformer\FloatToStringTransformer"/>
     </services>
 </container>
