@@ -125,5 +125,10 @@
         <service id="Experteam\ApiBaseBundle\Service\XmlReader\XmlReaderInterface" alias="api_base.xml_reader"/>
 
         <service id="Experteam\ApiBaseBundle\DataTransformer\FloatToStringTransformer"/>
+
+        <service id="Experteam\ApiBaseBundle\Form\FloatType">
+            <argument key="$transformer" type="service" id="Experteam\ApiBaseBundle\DataTransformer\FloatToStringTransformer"/>
+            <tag name="form.type"/>
+        </service>
     </services>
 </container>
