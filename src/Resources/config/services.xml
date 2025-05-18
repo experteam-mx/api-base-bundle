@@ -122,5 +122,10 @@
         <service id="Experteam\ApiBaseBundle\Service\DelayAlert\DelayAlertInterface" alias="api_base.delay_alert"/>
 
         <service id="Experteam\ApiBaseBundle\DataTransformer\FloatToStringTransformer"/>
+
+        <service id="Experteam\ApiBaseBundle\Form\FloatType">
+            <argument key="$transformer" type="service" id="Experteam\ApiBaseBundle\DataTransformer\FloatToStringTransformer"/>
+            <tag name="form.type"/>
+        </service>
     </services>
 </container>
