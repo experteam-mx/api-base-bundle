@@ -240,7 +240,9 @@ class Common
             switch ($status) {
                 case 'fail':
                     if (isset($content[Literal::DATA])) {
-                        $content[Literal::DATA][Literal::MESSAGE] = $messagePrefix . ($content[Literal::DATA][Literal::MESSAGE] ?? 'Request validation failed.');
+                        $message = $content[Literal::DATA][Literal::MESSAGE] ?? 'Request validation failed.';
+                        $message = is_array($message) ? json_encode($message) : $message;
+                        $content[Literal::DATA][Literal::MESSAGE] = $messagePrefix . $message;
                         $result[Literal::MESSAGE] = json_encode($content[Literal::DATA]);
                     }
 
