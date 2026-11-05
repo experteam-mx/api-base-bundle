@@ -13,28 +13,22 @@ class HttpResponse
 
     /**
      * @var string|null
-     * @Assert\NotBlank(message="The status is required.")
-     * @Assert\Type("string")
-     * @Assert\Choice(callback="getStatuses")
      */
+    #[Assert\NotBlank(message: 'The status is required.')]
+    #[Assert\Type('string')]
+    #[Assert\Choice(callback: 'getStatuses')]
     public $status;
 
     /**
      * @var string|null
-     * @Assert\Type(
-     *     type="string",
-     *     message="The message is not of type string."
-     * )
      */
+    #[Assert\Type(type: 'string', message: 'The message is not of type string.')]
     public $message;
 
     /**
      * @var array|null
-     * @Assert\Type(
-     *     type="array",
-     *     message="The data is not of type array."
-     * )
      */
+    #[Assert\Type(type: 'array', message: 'The data is not of type array.')]
     public $data;
 
     public function __construct(array $response = [])
@@ -49,9 +43,7 @@ class HttpResponse
         return [self::SUCCESS, self::FAIL, self::ERROR];
     }
 
-    /**
-     * @Assert\Callback
-     */
+    #[Assert\Callback]
     public function validate(ExecutionContextInterface $context)
     {
         if ($this->status == self::ERROR && is_null($this->message))

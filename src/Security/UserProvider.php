@@ -43,10 +43,10 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
      * method is not called.
      *
      * @param UserInterface $user
-     * @return void
+     * @return UserInterface
      * @throws Exception
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
@@ -62,7 +62,7 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
      * @param string $class
      * @return bool
      */
-    public function supportsClass(string $class)
+    public function supportsClass(string $class): bool
     {
         return User::class === $class || is_subclass_of($class, User::class);
     }

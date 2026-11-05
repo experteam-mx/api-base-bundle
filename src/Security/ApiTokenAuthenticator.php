@@ -175,10 +175,10 @@ class ApiTokenAuthenticator extends AbstractAuthenticator implements Authenticat
     /**
      * @param Request $request
      * @param AuthenticationException|null $authException
-     * @return Response|null
+     * @return Response
      * @throws Exception
      */
-    public function start(Request $request, AuthenticationException $authException = null): ?Response
+    public function start(Request $request, AuthenticationException $authException = null): Response
     {
         throw new HttpException(401, 'Unauthorized.');
     }
